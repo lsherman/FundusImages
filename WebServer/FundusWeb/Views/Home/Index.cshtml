@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>WebSite</title>
+        @Styles.Render("~/Content/css")
+        @Styles.Render("~/Content/themes/base/css");
+        @Scripts.Render("~/bundles/modernizr")
+    </head>
+    <body style="overflow:hidden; ">
+        <div id="page">
+            <div id="messageBox"></div>
+            <div id="header">
+                <p class="site-title">WebSite</p>
+            </div>
+            <div id="main">
+                <div id="webServiceTarget">Here is some text for the webService to update.</div>
+
+                <!-- Panel for fundus images -->
+                <div id="imageBar">
+                    <div id="imagePane">
+
+                    </div>
+                </div>
+
+                <!-- Panel for action history buttons -->
+                <div style="display:inline-block">
+                    <button id="undoButton">Undo</button>
+                    <button id="redoButton">Redo</button>
+                    <button title="Resets the application to its original state" id="resetButton">Reset</button>
+                </div>
+
+                <div id="footer">
+                    &copy; @DateTime.Now.Year - Web Site
+                </div>
+            </div>
+            <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/tiff, image/bmp" name="files[]" />
+            <button id="beginUploadButton">Begin Upload</button>
+        </div>
+    </body>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/page")
+    <script>
+        WebPage = new Page();
+        WebPage.init();
+    </script>
+</html>
