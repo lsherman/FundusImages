@@ -11,15 +11,11 @@ namespace FundusWeb.Controllers
     {
         Random rnd1 = new Random();
 
-        public FundusImage GetById(int id)
+        public FundusImage Segment(FundusImage image)
         {
-            // :TODO: Implement WebService endpoint for Image Segmentation
+            // :TODO: Call segmentation DLL
 
-            if (id == 0)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-            return new FundusImage { Id = rnd1.Next() };
+            return new FundusImage { id = image.id, data = "Server Data for id: " + image.id.ToString() };
         }
     }
 }

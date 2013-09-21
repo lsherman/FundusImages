@@ -2,6 +2,7 @@
 {
     public class FundusImage
     {
-        public int Id { get; set; }
+        public int id { get; set; }
+        public string data { get; set; }
     }
 }
