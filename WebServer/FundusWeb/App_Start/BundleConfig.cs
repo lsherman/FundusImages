@@ -43,6 +43,7 @@ namespace FundusWeb
                 "~/Scripts/ActionHistory.js",
                 "~/Scripts/FundusImage.js",
                 "~/Scripts/ImageBar.js",
+                "~/Scripts/ImageProcessing.js",
                 "~/Scripts/Message.js",
                 "~/Scripts/Page.js"));
         }

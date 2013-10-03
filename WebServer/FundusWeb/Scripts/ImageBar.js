@@ -37,29 +37,8 @@ ImageBar.prototype =
         this._images.splice(newIndex, 0, image);
 
         // Create the HTML element for the image bar
-        var img = document.createElement("img");
-        $(img).css("width", "100%")
-        // :TODO: Set loading src
-        $("#imagePane").append(img);
-        
-        // Set the image for the thumbnail
-        if (image.baseImage == null) {
-            $(image).bind("onBaseLoad.ImageBar", function (event, data) {
-                img.src = data.imgSrc;
-                $(image).unbind("onBaseLoad.ImageBar");
-            });
-        }
-        else img.src = image.baseImage;
-
-        // :DEBUG: 
-        $(image).bind("onSegLoad.ImageBar", function (event, data) {
-            $('#webServiceTarget').text(data.imgSrc);
-            $(image).unbind("onSegLoad.ImageBar");
-        });
-        $(image).bind("onSegError.ImageBar", function () {
-            $('#webServiceTarget').text('Error: ' + err);
-            $(image).unbind("onSegError.ImageBar");
-        });
+        var imageElem = image.createUiElement();
+        $("#imagePane").append(imageElem);
 
         if (!suppressHistory) WebPage.history.push(new AddRemImageAction(image, newIndex));
 

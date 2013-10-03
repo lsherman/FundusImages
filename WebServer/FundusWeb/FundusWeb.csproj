@@ -155,6 +155,7 @@
     </Compile>
     <Compile Include="Models\FundusImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Scripts\Canvas.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
@@ -217,6 +218,7 @@
     <Content Include="Scripts\ActionHistory.js" />
     <Content Include="Scripts\FundusImage.js" />
     <Content Include="Scripts\ImageBar.js" />
+    <Content Include="Scripts\ImageProcessing.js" />
     <Content Include="Scripts\Support\jquery-1.8.2.js" />
     <Content Include="Scripts\Support\jquery-1.8.2.min.js" />
     <None Include="Scripts\Support\jquery.validate-vsdoc.js" />
