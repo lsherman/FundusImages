@@ -35,6 +35,9 @@ Page.prototype =
             return 'Any unsaved data will be lost';
         };
 
+        // Apply the initial image view layout 
+        this.applyLayout();
+
         // Configure the undo/redo/reset buttons and the action history
         this.history = new ActionHistory();
         $("#undoButton").click(function () { WebPage.history.undo(); });
@@ -73,6 +76,22 @@ Page.prototype =
                 // No image specified error
             }
         });
+
+        // Configure the canvas elements
+        var canvasElem = document.getElementById("canvas");
+        this.canvas = new Canvas(canvasElem);
+    },
+
+    applyLayout: function () {
+        /// <summary>Applies the currently selected layout configuration</summary>
+
+        // Acquire the canvas handle
+        var canvas = $("#canvas");
+        var layout = $("#imageView");
+        var width  = layout.width();
+        var height = layout.height();
+        canvas.css('width', width);
+        canvas.css('height', height);
     },
 
     getState: function () {
@@ -114,6 +133,7 @@ Page.prototype =
 
     history:  null, /// <field name='history' type='ActionHistory'>The action history</field>
     imageBar: null, /// <field name='imageBar' type='ImageBar'>Manages load fundus images</field>
+    canvas: null,   /// <field name='canvas' type='Canvas'>Canvas used for image display/interaction</field>
 
     // Private:
 

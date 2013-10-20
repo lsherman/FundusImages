@@ -18,18 +18,13 @@ ImageBar.prototype =
 
         this._$element = $("#imageBar");
         this._images   = [];
-
-        // Enable sorting within the image pane
-        this._$element.find("#imagePane").sortable({
-            containment: "parent"
-        });
     },
 
     add: function (image, index, suppressHistory) {
         /// <summary>Adds a new fundus image to the image bar</summary>
         /// <param name="image" type="FundusImage">The image to be added</param>
         /// <param name="index" type="Number">The index of insertion</param>
-        /// <param name="suppressHistory" type="Boolean">If true, not action will be added to the history</param>
+        /// <param name="suppressHistory" type="Boolean">If true, action will not be added to the history</param>
 
         var newIndex;
         if (index == undefined) newIndex = this._images.length;

@@ -10,26 +10,28 @@
     <body style="overflow:hidden; ">
         <div id="page">
             <div id="header">
-                <p class="site-title">FundusWeb</p>
+                <p class="site-title" style="float:left">FundusWeb</p>
+                <div style="float:right">Welcome, UserName</div>
+                <div id="messageBar" style="background-color:green; position:absolute; right:0; width:32em; height:100%"></div>
             </div>
             <div id="main">
                 <div id="webServiceTarget">Here is some text for the webService to update.</div>
 
                 <!-- Panel for fundus images -->
                 <div id="imageBar">
-                    <div id="imagePane">
+                    <div id="imagePane" style="background-color:yellow">
 
                     </div>
                 
-                    <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/tiff, image/bmp" name="files[]" />
+                    <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/tiff, image/tiff-fx, image/bmp" name="files[]" />
                     <button id="beginUploadButton">Begin Upload</button>
                 </div>
 
-                <div id="viewPane">
-                    <canvas id="canvas" style="position:relative; left:0; right:0; top:0; bottom:0;"></canvas> 
+                <div id="imageView" style="position:absolute; left:0; right:300px; height:100%; border:1px solid black;">
+                    <canvas id="canvas" style="position:absolute; left:0; top:0;"></canvas> 
                 </div>
 
-                <div id="menuPanel" style="background-color: brown; position:relative; top:0; bottom:0; left:200px; right:0">
+                <div id="menuPanel" style="background-color: brown; overflow:hidden; position:relative; top:0; bottom:0; width:200px; right:0">
 
                 </div>
 
@@ -38,10 +40,6 @@
                     <button id="undoButton">Undo</button>
                     <button id="redoButton">Redo</button>
                     <button title="Resets the application to its original state" id="resetButton">Reset</button>
-                </div>
-
-                <div id="footer">
-                    &copy; @DateTime.Now.Year - Web Site
                 </div>
             </div>
             <div id="messageBox"></div>

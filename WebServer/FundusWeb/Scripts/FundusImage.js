@@ -21,6 +21,7 @@ function FundusImage(id, file) {
             { id: this.id, data: this.baseImage },
             $.proxy(function (data, textStatus, jqXHR) {
                 this.segImage = data.data;
+                WebPage.canvas.setImage(this);
                 $(this).trigger("onSegLoad", { imgSrc: this.segImage });
             }, this), "json")
             .fail(function (jqXHR, textStatus, err) {
@@ -39,8 +40,15 @@ FundusImage.prototype =
         var img = $("<img draggable='true'></img>");
         $(img).css("width", "100%")
         $(img).data("Image", this);
-        // :TODO: Set loading src
-        $("#imagePane").append(img);
+
+        // Display the image when clicked
+        $(img).click($.proxy(function () {
+            // Check if this is already the current image
+
+            WebPage.canvas.setImage(this);
+
+            //WebPage.history.push();
+        }, this));
 
         // Set the image for the thumbnail
         if (this.baseImage == null) {
@@ -63,15 +71,19 @@ FundusImage.prototype =
             // Message("");
             $(this).unbind("onSegError.ImageBar");
         });
+
+        return img;
     },
 
     id:        0,    /// <field name='id'         type='Number'>Unique identifier</field>
     file:      null, /// <field name='file'      type='File'>The source file for the image</field>
-    baseImage: null, /// <field name='baseImage' type='File'>The original image dataURI, or null if unloaded</field>
-    segImage:  null, /// <field name='segImage'  type='File'>The segmented image dataURI, or null if unloaded</field>
+    baseImage: null, /// <field name='baseImage' type='URI'>The original image dataURI, or null if unloaded</field>
+    segImage:  null, /// <field name='segImage'  type='URI'>The segmented image dataURI, or null if unloaded</field>
 
     // *** Display Parameters ***
     _window: 0.5,        /// <field name='_window' type='Array'>Window size for the image</field>
     _level: 0.5,         /// <field name='_level' type='Number'>Level value for the image</field>
+    _zoomLevel: 1.0,
+    _offset: { x: 0, y: 0 },
     _annotations: [],    /// <field name='_annotations' type='Array'>List of annotations on the image</field>
 }

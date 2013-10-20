@@ -41,6 +41,7 @@ namespace FundusWeb
 
             bundles.Add(new ScriptBundle("~/bundles/page").Include(
                 "~/Scripts/ActionHistory.js",
+                "~/Scripts/Canvas.js",
                 "~/Scripts/FundusImage.js",
                 "~/Scripts/ImageBar.js",
                 "~/Scripts/ImageProcessing.js",
