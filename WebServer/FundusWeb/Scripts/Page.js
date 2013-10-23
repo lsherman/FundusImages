@@ -35,6 +35,9 @@ Page.prototype =
             return 'Any unsaved data will be lost';
         };
 
+        // Hook the resize event to the page
+        $(window).resize($.proxy(this._onResize, this));
+
         // Apply the initial image view layout 
         this.applyLayout();
 
@@ -131,11 +134,17 @@ Page.prototype =
 
     // Public:
 
-    history:  null, /// <field name='history' type='ActionHistory'>The action history</field>
+    history: null,  /// <field name='history' type='ActionHistory'>The action history</field>
     imageBar: null, /// <field name='imageBar' type='ImageBar'>Manages load fundus images</field>
     canvas: null,   /// <field name='canvas' type='Canvas'>Canvas used for image display/interaction</field>
 
     // Private:
+
+    _onResize: function () {
+        /// <summary>Updates the page on a resize event</summary>
+
+        this.applyLayout();
+    },
 
     _onAction: function () {
         /// <summary>Updates the history buttons when an action occurs</summary>

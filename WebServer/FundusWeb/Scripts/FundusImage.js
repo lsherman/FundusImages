@@ -10,6 +10,9 @@ function FundusImage(id, file) {
     this.file = file;
     this.id   = id;
 
+    this._annotations = [];
+    this._offset      = { x: 0, y: 0 };
+
     // Load the base image, then submit the segmentation request
     var reader = new FileReader();
     reader.onloadend = $.proxy(function () {
@@ -33,16 +36,28 @@ function FundusImage(id, file) {
 
 FundusImage.prototype =
 {
+    move: function (xDist, yDist) {
+        /// <summary>Changes the position of the image</summary>
+        this._offset.x += xDist;
+        this._offset.y += yDist;
+        $(this).trigger('positionChanged', { image: this });
+    },
+
+    zoom: function (steps) {
+        /// <summary>Changes the zoomlevel of the image</summary>
+        this._zoomLevel += steps;
+        $(this).trigger('zoomChanged', { image: this });
+    },
+
     createUiElement: function () {
         /// <summary>Creates an HTML list element for the image bar</summary>
 
         // Create the HTML element for the image bar
-        var img = $("<img draggable='true'></img>");
-        $(img).css("width", "100%")
-        $(img).data("Image", this);
+        var img = $("<img draggable='false' style='position:relative; width:80%; left:10%; border:2px solid yellow'></img>");
+        img.data("Image", this);
 
         // Display the image when clicked
-        $(img).click($.proxy(function () {
+        img.click($.proxy(function () {
             // Check if this is already the current image
 
             WebPage.canvas.setImage(this);
@@ -61,7 +76,7 @@ FundusImage.prototype =
 
         // :DEBUG: 
         $(this).bind("onSegLoad.ImageBar", function (event, data) {
-            $('#webServiceTarget').text(data.imgSrc);
+            // HAS IMAGE
             $(this).unbind("onSegLoad.ImageBar");
         });
 
@@ -83,7 +98,7 @@ FundusImage.prototype =
     // *** Display Parameters ***
     _window: 0.5,        /// <field name='_window' type='Array'>Window size for the image</field>
     _level: 0.5,         /// <field name='_level' type='Number'>Level value for the image</field>
-    _zoomLevel: 1.0,
+    _zoomLevel: 1.0,     /// <field name='_zoomLevel' type='Number'>Zoom scale for the image</field>
     _offset: { x: 0, y: 0 },
     _annotations: [],    /// <field name='_annotations' type='Array'>List of annotations on the image</field>
 }

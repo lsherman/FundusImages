@@ -15,16 +15,19 @@
                 <div id="messageBar" style="background-color:green; position:absolute; right:0; width:32em; height:100%"></div>
             </div>
             <div id="main">
-                <div id="webServiceTarget">Here is some text for the webService to update.</div>
-
                 <!-- Panel for fundus images -->
                 <div id="imageBar">
-                    <div id="imagePane" style="background-color:yellow">
-
-                    </div>
+                    <div id="imagePane"></div>
                 
                     <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/tiff, image/tiff-fx, image/bmp" name="files[]" />
                     <button id="beginUploadButton">Begin Upload</button>
+
+                    <!-- Panel for action history buttons -->
+                    <div style="display:inline-block">
+                        <button id="undoButton">Undo</button>
+                        <button id="redoButton">Redo</button>
+                        <button title="Resets the application to its original state" id="resetButton">Reset</button>
+                    </div>
                 </div>
 
                 <div id="imageView" style="position:absolute; left:0; right:300px; height:100%; border:1px solid black;">
@@ -33,13 +36,6 @@
 
                 <div id="menuPanel" style="background-color: brown; overflow:hidden; position:relative; top:0; bottom:0; width:200px; right:0">
 
-                </div>
-
-                <!-- Panel for action history buttons -->
-                <div style="display:inline-block">
-                    <button id="undoButton">Undo</button>
-                    <button id="redoButton">Redo</button>
-                    <button title="Resets the application to its original state" id="resetButton">Reset</button>
                 </div>
             </div>
             <div id="messageBox"></div>
