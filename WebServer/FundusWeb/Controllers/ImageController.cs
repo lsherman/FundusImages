@@ -53,10 +53,14 @@ namespace FundusWeb.Controllers
             // **
             // Execute the segmentation process on the image file
             // **
+            // :NOTE: For debug, set Window=true, Shell=true, WindowStyle=Normal
+            // :NOTE: In any case this is temp until we do a direct call to DLL
+            //        from within the server thread.
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.CreateNoWindow = false;
             startInfo.UseShellExecute = false;
-            startInfo.FileName = "mylib.exe"; // :TODO: Whatever this is
+            startInfo.WorkingDirectory = appdir;
+            startInfo.FileName = appdir + "Vasc_detection_rework_DRIVE_classify_DRIVE_trn.exe";
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.Arguments = ifile;
 
@@ -74,11 +78,11 @@ namespace FundusWeb.Controllers
             // **
             // Load the output file from the segmentation 
             // **
-            var ofile      = appdir + "image.tiff"; // :TODO: Whatever this is
-            var obytes = File.ReadAllBytes(ofile);
+            var ofile      = appdir + "Data\\DRIVE segmented\\01_test.tif";
+            var obytes     = File.ReadAllBytes(ofile);
             var ob64String = Convert.ToBase64String(obytes);
-            var dataUrl    = "data:image/"
-                + Path.GetExtension(ofile).Replace(".", "")
+            var dataUrl    = "data:image/tiff"
+                //+ Path.GetExtension(ofile).Replace(".", "")
                 + ";base64," 
                 + ob64String;
 
