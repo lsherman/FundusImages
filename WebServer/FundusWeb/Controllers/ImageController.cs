@@ -45,10 +45,6 @@ namespace FundusWeb.Controllers
             {
                 var i = 0;
             }
-            catch
-            {
-                var i = 0;
-            }
 
             // **
             // Execute the segmentation process on the image file
@@ -57,11 +53,11 @@ namespace FundusWeb.Controllers
             // :NOTE: In any case this is temp until we do a direct call to DLL
             //        from within the server thread.
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = false;
-            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            startInfo.UseShellExecute = true;
             startInfo.WorkingDirectory = appdir;
             startInfo.FileName = appdir + "Vasc_detection_rework_DRIVE_classify_DRIVE_trn.exe";
-            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            startInfo.WindowStyle = ProcessWindowStyle.Normal;
             startInfo.Arguments = ifile;
 
             try
