@@ -38,7 +38,7 @@ Canvas.prototype =
             ctx.fillStyle = "#000000";
             ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
             ctx.fill();
-            ctx.drawImage(img, this._fundusImage._offset.x, this._fundusImage._offset.y, 100, 100);
+            ctx.drawImage(img, this._fundusImage._offset.x, this._fundusImage._offset.y, 512, 512);
         }, this);
 
         if (this._fundusImage.segImage == null) {

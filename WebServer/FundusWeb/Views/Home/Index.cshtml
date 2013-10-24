@@ -12,15 +12,16 @@
             <div id="header">
                 <p class="site-title" style="float:left">FundusWeb</p>
                 <div style="float:right">Welcome, UserName</div>
-                <div id="messageBar" style="background-color:green; position:absolute; right:0; width:32em; height:100%"></div>
+                <div id="messageBar" style="background-color:rgb(234, 234, 234); position:absolute; right:0; width:32em; height:100%"></div>
             </div>
             <div id="main">
                 <!-- Panel for fundus images -->
-                <div id="imageBar">
-                    <div id="imagePane"></div>
-                
+                <div id="imageBar" style="border-right:1px solid black; border-top:1px solid black; border-bottom:1px solid black;">
                     <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/tiff, image/tiff-fx, image/bmp" name="files[]" />
                     <button id="beginUploadButton">Begin Upload</button>
+
+                    <div id="imagePane"></div>
+                
 
                     <!-- Panel for action history buttons -->
                     <div style="display:inline-block">
