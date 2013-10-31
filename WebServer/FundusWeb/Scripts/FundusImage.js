@@ -60,7 +60,7 @@ FundusImage.prototype =
         /// <summary>Creates an HTML list element for the image bar</summary>
 
         // Create the HTML element for the image bar
-        var img = $("<img draggable='false' style='position:relative; width:80%; left:10%; border:2px solid yellow'></img>");
+        var img = $("<img draggable='false' class='image-thumb'></img>");
         img.data("Image", this);
 
         // Display the image when clicked

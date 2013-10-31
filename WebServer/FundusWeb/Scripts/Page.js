@@ -95,6 +95,8 @@ Page.prototype =
         var height = layout.height();
         canvas.css('width', width);
         canvas.css('height', height);
+        canvas.attr('width', width);
+        canvas.attr('height', height);
     },
 
     getState: function () {

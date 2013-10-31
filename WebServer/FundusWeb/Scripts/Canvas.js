@@ -38,17 +38,17 @@ Canvas.prototype =
             ctx.fillStyle = "#000000";
             ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
             ctx.fill();
-            ctx.drawImage(img, this._fundusImage._offset.x, this._fundusImage._offset.y, 512, 512);
+            ctx.drawImage(img, this._fundusImage._offset.x, this._fundusImage._offset.y);
         }, this);
 
         if (this._fundusImage.segImage == null) {
             $(this).bind("onSegLoad.ImageBar", function (event, data) {
-                img.src = this._fundusImage.segImage;
+                img.src = this._fundusImage.baseImage;
                 $(this).unbind("onSegLoad.ImageBar");
             });
             paint();
         }
-        else img.src = this._fundusImage.segImage;
+        else img.src = this._fundusImage.baseImage;
 
         paint();
 
@@ -104,10 +104,8 @@ Canvas.prototype =
 
         // Apply active tool on left button
         if (this._mousebutton[0]) {
-            var window = this._fundusImage._window / 500.0;
-            var level  = this._fundusImage._level  / 500.0;
-            window += moveX;
-            level  += moveY;
+            var window = moveX / 500.0 + this._fundusImage._window;
+            var level  = moveY / 500.0 + this._fundusImage._level;
             this._fundusImage.setWindowLevel(window, level);
         }
 

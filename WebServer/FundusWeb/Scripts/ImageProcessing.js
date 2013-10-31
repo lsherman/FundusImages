@@ -12,8 +12,8 @@ FundusWeb.Image = {
         /// <param name="window" type="Number">The normalized window half-width</param>
         /// <param name="level" type="Number">The normalized level</param>
 
-        var min   = Math.min(level - window, 0.0);
-        var max   = Math.max(level + window, 1.0);
+        var min   = Math.max(level - window, 0.0);
+        var max   = Math.min(level + window, 1.0);
         var range = max - min;
 
         // Apply the window level to each pixel element
