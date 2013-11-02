@@ -51,6 +51,10 @@ ImageBar.prototype =
 
         var image = this._images[index];
 
+        if (WebPage.canvas.getImage() == image) {
+            WebPage.canvas.setImage(null);
+        }
+
         $(image).unbind(".ImageBar");
 
         $("#imagePane").children().slice(index).detach();

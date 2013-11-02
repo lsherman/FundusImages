@@ -35,11 +35,11 @@ Page.prototype =
             return 'Any unsaved data will be lost';
         };
 
-        // Hook the resize event to the page
-        $(window).resize($.proxy(this._onResize, this));
+        // Hook the mouse wheel to the image zoom functionality
+        window.onmousewheel = $.proxy(this._onMouseWheel, this);
 
-        // Apply the initial image view layout 
-        this.applyLayout();
+        // Hook the resize event to the page
+        window.onresize = $.proxy(this._onResize, this);
 
         // Configure the undo/redo/reset buttons and the action history
         this.history = new ActionHistory();
@@ -69,20 +69,21 @@ Page.prototype =
         }, false);
 
         // Configure the upload control panel elements
-        $("#beginUploadButton").click(function () {
+        $("#uploadButton").click(function () { $("#files").click(); });
+        $("#files").change(function () {
             var files = document.getElementById("files").files;
             if (files.length != 0) {
                 var id = WebPage.generateUID();
                 WebPage.imageBar.add(new FundusImage(id, files[0]));
-            }
-            else {
-                // No image specified error
             }
         });
 
         // Configure the canvas elements
         var canvasElem = document.getElementById("canvas");
         this.canvas = new Canvas(canvasElem);
+
+        // Apply the initial image view layout 
+        this.applyLayout();
     },
 
     applyLayout: function () {
@@ -97,6 +98,9 @@ Page.prototype =
         canvas.css('height', height);
         canvas.attr('width', width);
         canvas.attr('height', height);
+
+        // Redraw the image
+        WebPage.canvas.draw();
     },
 
     getState: function () {
@@ -146,6 +150,17 @@ Page.prototype =
         /// <summary>Updates the page on a resize event</summary>
 
         this.applyLayout();
+    },
+
+    _onMouseWheel: function (e) {
+        /// <summary>Redirects the mouse wheel from browser default to image zoom</summary>
+
+        e.preventDefault();
+        var image = WebPage.canvas.getImage();
+        if (image) {
+            var delta = e.wheelDelta;
+            image.zoom(delta);
+        }
     },
 
     _onAction: function () {

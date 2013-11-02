@@ -159,4 +159,4 @@ P=bwareaopen(P,30).*mask;
 fprintf('Processing time: %d',toc(tstart));
 
 %% Save the finally segmented image
-imwrite(P, [evalfile '.png'], 'png', 'Transparency', [0]);
+imwrite(P, [evalfile '.png'], 'png', 'Transparency', 0);

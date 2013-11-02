@@ -32,13 +32,26 @@ Canvas.prototype =
 
         var ctx = this._canvasElem.getContext("2d");
 
-        var img = new Image();
-        
-        var paint = $.proxy(function () {
+        // If there is not image set, clear the drawing canvas
+        if (!this._fundusImage) {
             ctx.fillStyle = "#000000";
             ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
             ctx.fill();
+            return;
+        }
+
+        // ... Otherwise draw the image
+        var img = new Image();
+        
+        var paint = $.proxy(function () {
+            ctx.save();
+            ctx.fillStyle = "#000000";
+            ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
+            ctx.fill();
+            var zoom = this._fundusImage._zoomLevel;
+            ctx.scale(zoom, zoom);
             ctx.drawImage(img, this._fundusImage._offset.x, this._fundusImage._offset.y);
+            ctx.restore();
         }, this);
 
         if (this._fundusImage.segImage == null) {
@@ -51,7 +64,7 @@ Canvas.prototype =
         else img.src = this._fundusImage.baseImage;
 
         paint();
-
+        return;
         // Acquire the canvas image data
         var img = ctx.getImageData(0, 0, this._canvasElem.width, this._canvasElem.height);
         var pix = img.data;
@@ -74,6 +87,7 @@ Canvas.prototype =
         var canvas = this;
         $(this._fundusImage).bind('positionChanged', function () { canvas.draw(); });
         $(this._fundusImage).bind('windowLevelChanged', function () { canvas.draw(); });
+        $(this._fundusImage).bind('zoomChanged', function () { canvas.draw(); });
 
         this.draw();
     },
@@ -90,6 +104,10 @@ Canvas.prototype =
             document.body.appendChild(iframe);
         }
         iframe.src = this._canvasElem.toDataURL();
+    },
+
+    getImage: function () {
+        return this._fundusImage;
     },
 
 // Private:
@@ -117,10 +135,10 @@ Canvas.prototype =
     },
 
     _drawLine: function () {
+
     },
 
 // Private:
-
     _mousebutton: [],           /// <field name='_mousebutton' type='Array'>Tracking array for mouse button status</field>
     _mousePos: { x: 0, y: 0 },  /// <field name='_mousePos'>The mouse position for the mose recent event</field>
     _fundusImage: null,         /// <field name='_fundusImage' type='FundusImage'>The image currently in this canvas</field>

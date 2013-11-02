@@ -43,9 +43,17 @@ FundusImage.prototype =
         $(this).trigger('positionChanged', { image: this });
     },
 
-    setZoom: function (distance) {
+    zoom: function (steps) {
         /// <summary>Changes the zoomlevel of the image</summary>
-        this._zoomLevel = distance;
+
+        var scale = this._zoomLevel + steps / 100.0;
+        scale = Math.min(100, Math.max(0.1, scale));
+        this.setZoom(scale);
+    },
+
+    setZoom: function (scale) {
+        /// <summary>Changes the zoomlevel of the image</summary>
+        this._zoomLevel = scale;
         $(this).trigger('zoomChanged', { image: this });
     },
 

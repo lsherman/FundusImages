@@ -87,9 +87,11 @@ h5, h6 {
     #imagePane
     {
         background-color:lightgray;
-        position:relative;
+        position:absolute;
         overflow-y:scroll;
-        height:90%;
+        border: 1px solid #888;
+        top:48px;
+        bottom:48px;
         width:100%;
     }
 
@@ -114,10 +116,10 @@ h5, h6 {
 ----------------------------------------------------------*/
 #header .site-title {
     float: left;
-    font-weight: bold;
-    padding: 5px 0;
+    font: bold 16px sans-serif;
+    padding: 5px 5px;
     margin: 0;
-    color: #000;
+    color: #888;
     border: none;
     font-size: 16px;
     
@@ -247,6 +249,52 @@ input[type="text"].error-field, input[type="password"].error-field {
 
 /* Image toolbar
 ----------------------------------------------------------*/
+#files {
+    position:relative;
+    left: 8px;
+    right: 8px;
+    top: 8px;
+    height: 32px;
+    margin-bottom: 16px;
+}
+
+#uploadButton {
+    position: absolute;
+    border:1px solid rgb(40, 200, 90);
+    color: white;
+    font: bold 16px sans-serif;
+    left: 8px;
+    right: 8px;
+    top: 8px;
+    height: 32px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+
+    background: #2ab74f; /* Old browsers */
+    background: -moz-linear-gradient(top,  #2ab74f 0%, #30d862 6%, #30d862 95%, #2ab74f 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2ab74f), color-stop(6%,#30d862), color-stop(95%,#30d862), color-stop(100%,#2ab74f)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #2ab74f 0%,#30d862 6%,#30d862 95%,#2ab74f 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #2ab74f 0%,#30d862 6%,#30d862 95%,#2ab74f 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #2ab74f 0%,#30d862 6%,#30d862 95%,#2ab74f 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #2ab74f 0%,#30d862 6%,#30d862 95%,#2ab74f 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2ab74f', endColorstr='#2ab74f',GradientType=0 ); /* IE6-9 */
+}
+
+    #uploadButton:hover {
+        background: #15b53d; /* Old browsers */
+        background: -moz-linear-gradient(top,  #15b53d 0%, #28d659 6%, #28d659 95%, #15b53d 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#15b53d), color-stop(6%,#28d659), color-stop(95%,#28d659), color-stop(100%,#15b53d)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #15b53d 0%,#28d659 6%,#28d659 95%,#15b53d 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #15b53d 0%,#28d659 6%,#28d659 95%,#15b53d 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #15b53d 0%,#28d659 6%,#28d659 95%,#15b53d 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  #15b53d 0%,#28d659 6%,#28d659 95%,#15b53d 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#15b53d', endColorstr='#15b53d',GradientType=0 ); /* IE6-9 */
+    }
+
+    #uploadButton:active {
+        border:3px dashed #222;
+    }
+
 .image-thumb {
     position:relative; 
     padding:2px; 
@@ -261,4 +309,39 @@ input[type="text"].error-field, input[type="password"].error-field {
 
     .image-thumb:active {
         border:4px solid #CCC;
+    }
+    
+/* Action History
+----------------------------------------------------------*/
+.history-button {
+    border:1px solid #78a0ff;
+    color: white;
+    font: bold 16px sans-serif;
+    border-radius: 3px;
+    margin: 8px;
+    height:32px;
+
+    background: #ad2929; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ad2929 0%, #90d2ed 4%, #ea3e38 4%, #ea3e38 96%, #ad2929 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ad2929), color-stop(4%,#90d2ed), color-stop(4%,#ea3e38), color-stop(96%,#ea3e38), color-stop(100%,#ad2929)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ad2929', endColorstr='#ad2929',GradientType=0 ); /* IE6-9 */
+}
+
+    .history-button:hover {
+        background: #991910; /* Old browsers */
+        background: -moz-linear-gradient(top,  #991910 0%, #e81e17 5%, #e81e17 95%, #991910 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#991910), color-stop(5%,#e81e17), color-stop(95%,#e81e17), color-stop(100%,#991910)); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  #991910 0%,#e81e17 5%,#e81e17 95%,#991910 100%); /* Chrome10+,Safari5.1+ */
+        background: -o-linear-gradient(top,  #991910 0%,#e81e17 5%,#e81e17 95%,#991910 100%); /* Opera 11.10+ */
+        background: -ms-linear-gradient(top,  #991910 0%,#e81e17 5%,#e81e17 95%,#991910 100%); /* IE10+ */
+        background: linear-gradient(to bottom,  #991910 0%,#e81e17 5%,#e81e17 95%,#991910 100%); /* W3C */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#991910', endColorstr='#991910',GradientType=0 ); /* IE6-9 */
+    }
+
+    .history-button:active {
+        border:3px dashed #222;
     }
