@@ -16,16 +16,29 @@ function FundusImage(id, file) {
     // Load the base image, then submit the segmentation request
     var reader = new FileReader();
     reader.onloadend = $.proxy(function () {
-        this.baseImage = reader.result;
-        $(this).trigger("onBaseLoad", { imgSrc: this.baseImage });
+
+        // Decode the image and extract statistics
+        var img = new Image();
+        img.src = reader.result;
+        img.onload = $.proxy(function () {
+            this.baseImage = img;
+            $(this).trigger("onBaseLoad", { img: img });
+        }, this);
+
+        // Present this image in the current view
+        WebPage.canvas.setImage(this);
 
         // Issue the segmentation request to the server
         $.post('api/image/segment',
-            { id: this.id, data: this.baseImage },
+            { id: this.id, data: reader.result },
             $.proxy(function (data, textStatus, jqXHR) {
-                this.segImage = data.data;
-                WebPage.canvas.setImage(this);
-                $(this).trigger("onSegLoad", { imgSrc: this.segImage });
+                // Decode the image and extract statistics
+                var img = new Image();
+                img.src = data.data;
+                img.onload = $.proxy(function () {
+                    this.segImage = img;
+                    $(this).trigger("onSegLoad", { imgSrc: this.segImage });
+                }, this);
             }, this), "json")
             .fail(function (jqXHR, textStatus, err) {
                 $(this).trigger("onSegError", err);
@@ -83,11 +96,11 @@ FundusImage.prototype =
         // Set the image for the thumbnail
         if (this.baseImage == null) {
             $(this).bind("onBaseLoad.ImageBar", function (event, data) {
-                img.attr('src', data.imgSrc);
+                img.attr('src', this.baseImage.src);
                 $(this).unbind("onBaseLoad.ImageBar");
             });
         }
-        else img.attr('src', this.baseImage);
+        else img.attr('src', this.baseImage.src);
 
         // :DEBUG: 
         $(this).bind("onSegLoad.ImageBar", function (event, data) {
@@ -97,7 +110,6 @@ FundusImage.prototype =
 
         // :TODO:
         $(this).bind("onSegError.ImageBar", function () {
-            $('#webServiceTarget').text('Error: ' + err);
             // Message("");
             $(this).unbind("onSegError.ImageBar");
         });

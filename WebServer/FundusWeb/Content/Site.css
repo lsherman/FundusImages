@@ -263,12 +263,9 @@ input[type="text"].error-field, input[type="password"].error-field {
     border:1px solid rgb(40, 200, 90);
     color: white;
     font: bold 16px sans-serif;
-    left: 8px;
-    right: 8px;
-    top: 8px;
-    height: 32px;
-    margin-bottom: 8px;
-    border-radius: 3px;
+    width:100%;
+    left:0;
+    height: 48px;
 
     background: #2ab74f; /* Old browsers */
     background: -moz-linear-gradient(top,  #2ab74f 0%, #30d862 6%, #30d862 95%, #2ab74f 100%); /* FF3.6+ */
@@ -314,12 +311,11 @@ input[type="text"].error-field, input[type="password"].error-field {
 /* Action History
 ----------------------------------------------------------*/
 .history-button {
-    border:1px solid #78a0ff;
+    border:1px solid #be3e16;
     color: white;
     font: bold 16px sans-serif;
-    border-radius: 3px;
-    margin: 8px;
-    height:32px;
+    height:48px;
+    width:30%;
 
     background: #ad2929; /* Old browsers */
     background: -moz-linear-gradient(top,  #ad2929 0%, #90d2ed 4%, #ea3e38 4%, #ea3e38 96%, #ad2929 100%); /* FF3.6+ */

@@ -30,49 +30,44 @@ Canvas.prototype =
     draw: function () {
         /// <summary>Redraws the image on the canvas element</summary>
 
-        var ctx = this._canvasElem.getContext("2d");
-
-        // If there is not image set, clear the drawing canvas
+        // If there is no image set, clear the drawing canvas
         if (!this._fundusImage) {
+            var ctx = this._canvasElem.getContext("2d");
             ctx.fillStyle = "#000000";
             ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
             ctx.fill();
             return;
         }
 
-        // ... Otherwise draw the image
-        var img = new Image();
-        
-        var paint = $.proxy(function () {
-            ctx.save();
-            ctx.fillStyle = "#000000";
-            ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
-            ctx.fill();
-            var zoom = this._fundusImage._zoomLevel;
-            ctx.scale(zoom, zoom);
-            ctx.drawImage(img, this._fundusImage._offset.x, this._fundusImage._offset.y);
-            ctx.restore();
-        }, this);
+        // If there is an unloaded image, display load graphic
+        if (!this._fundusImage.baseImage) return;
 
-        if (this._fundusImage.segImage == null) {
-            $(this).bind("onSegLoad.ImageBar", function (event, data) {
-                img.src = this._fundusImage.baseImage;
-                $(this).unbind("onSegLoad.ImageBar");
-            });
-            paint();
-        }
-        else img.src = this._fundusImage.baseImage;
+        // Acquire a handle to the canvas context
+        var ctx = this._canvasElem.getContext("2d");
 
-        paint();
+        // Compute the image position offset
+        var s = this._fundusImage._zoomLevel;
+        var w = this._canvasElem.width  / s / 2;
+        var h = this._canvasElem.height / s / 2;
+        var x = w + this._fundusImage._offset.x;
+        var y = h + this._fundusImage._offset.y;
+        x -= this._fundusImage.baseImage.width / 2;
+        y -= this._fundusImage.baseImage.height / 2;
+
+        // Draw the fundus images
+        ctx.save();
+        ctx.fillStyle = "#000000";
+        ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
+        ctx.fill();
+        ctx.scale(s, s);
+        ctx.drawImage(this._fundusImage.baseImage, x, y);
+        ctx.restore();
         return;
+
         // Acquire the canvas image data
         var img = ctx.getImageData(0, 0, this._canvasElem.width, this._canvasElem.height);
         var pix = img.data;
-
-        // Apply the window level to the base fundus image
         FundusWeb.Image.windowLevel(pix, this._fundusImage._window, this._fundusImage._level);
-
-        // Replace the image data
         ctx.putImageData(img, 0, 0);
     },
 
@@ -85,6 +80,7 @@ Canvas.prototype =
         this._fundusImage = image;
 
         var canvas = this;
+        $(this._fundusImage).bind('onSegLoad', function () { canvas.draw(); });
         $(this._fundusImage).bind('positionChanged', function () { canvas.draw(); });
         $(this._fundusImage).bind('windowLevelChanged', function () { canvas.draw(); });
         $(this._fundusImage).bind('zoomChanged', function () { canvas.draw(); });
@@ -94,6 +90,8 @@ Canvas.prototype =
 
     download: function () {
         /// <summary>Downloads the annotated image to the client</summary>
+
+        // :TODO: Render to offscreen canvas of appropriate dimensions
 
         var iframeId = 'hiddenDownloader';
         var iframe   = document.getElementById(hiddenIFrameID);
@@ -117,8 +115,11 @@ Canvas.prototype =
 
         if (!this._fundusImage) return;
 
+        var scale = this._fundusImage._zoomLevel;
         var moveX = this._mousePos.x - e.screenX;
         var moveY = this._mousePos.y - e.screenY;
+        moveX /= scale;
+        moveY /= scale;
 
         // Apply active tool on left button
         if (this._mousebutton[0]) {
@@ -143,5 +144,4 @@ Canvas.prototype =
     _mousePos: { x: 0, y: 0 },  /// <field name='_mousePos'>The mouse position for the mose recent event</field>
     _fundusImage: null,         /// <field name='_fundusImage' type='FundusImage'>The image currently in this canvas</field>
     _canvasElem: null,          /// <field name='_canvasElem' type=''>The HTML canvas elemented associated with this object</field>
-    
 }
