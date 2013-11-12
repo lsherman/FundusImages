@@ -49,6 +49,13 @@ function FundusImage(id, file) {
 
 FundusImage.prototype =
 {
+    setPosition: function (x, y) {
+        /// <summary>Changes the position of the image</summary>
+        this._offset.x = x;
+        this._offset.y = y;
+        $(this).trigger('positionChanged', { image: this });
+    },
+
     move: function (xDist, yDist) {
         /// <summary>Changes the position of the image</summary>
         this._offset.x += xDist;
@@ -58,7 +65,6 @@ FundusImage.prototype =
 
     zoom: function (steps) {
         /// <summary>Changes the zoomlevel of the image</summary>
-
         var scale = this._zoomLevel + steps / 100.0;
         scale = Math.min(100, Math.max(0.1, scale));
         this.setZoom(scale);
@@ -81,7 +87,7 @@ FundusImage.prototype =
         /// <summary>Creates an HTML list element for the image bar</summary>
 
         // Create the HTML element for the image bar
-        var img = $("<img draggable='false' class='image-thumb'></img>");
+        var img = $("<img draggable='false' class='image-thumb'></img><div style='height:32px;'></div>");
         img.data("Image", this);
 
         // Display the image when clicked

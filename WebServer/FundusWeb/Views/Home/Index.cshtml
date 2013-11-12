@@ -32,11 +32,18 @@
 
                 <div id="imageView" style="position:absolute; left:0; right:300px; height:100%; border:1px solid black;">
                     <canvas id="canvas" style="position:absolute; left:0; top:0;"></canvas> 
+                
+                    <!-- Quick tools for the image viewer -->
+                    <div id="quickTools" style="position:absolute; right:64px; bottom:32px;">
+                        <button class="quickPageFit"/><label for="quickPageFit">F</label>
+                        <button class="quickZoomIn"/><label for="quickZoomIn">Zi</label>
+                        <button class="quickZoomOut"/><label for="quickZoomOut">Zo</label>
+                        <button class="quickSave"/><label for="quikSave">S</label>
+                        <button class="quickPrint"/><label for="quickPrint">P</label>
+                    </div>
                 </div>
 
-                <div id="menuPanel" style="background-color: brown; overflow:hidden; position:relative; top:0; bottom:0; width:200px; right:0">
-
-                </div>
+                <div id="menuPanel" style="background-color: brown; overflow:hidden; position:relative; top:0; bottom:0; width:200px; right:0"></div>
             </div>
             <div id="messageBox"></div>
         </div>

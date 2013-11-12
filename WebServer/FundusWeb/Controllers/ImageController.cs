@@ -50,6 +50,7 @@ namespace FundusWeb.Controllers
             // Execute the segmentation process on the image file
             // **
             // :NOTE: For debug, set Window=true, Shell=true, WindowStyle=Normal
+            //        else Window=false, Shell=false, WindowStyle=Hidden
             // :NOTE: In any case this is temp until we do a direct call to DLL
             //        from within the server thread.
             ProcessStartInfo startInfo = new ProcessStartInfo();

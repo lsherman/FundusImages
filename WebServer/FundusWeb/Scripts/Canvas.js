@@ -21,14 +21,65 @@ function Canvas(canvasElem) {
         this._mousebutton[e.which-1] = false;
     }, this));
 
+    // Handle the canvas quick-tool buttons
+    var quickTools = $("#quickTools");
+    quickTools.buttonset();
+    quickTools.find(".quickPageFit").click($.proxy(this.fitToPage, this));
+    quickTools.find(".quickSave").click($.proxy(this.download, this));
+    quickTools.find(".quickPrint").click($.proxy(this.print, this));
+    quickTools.find(".quickZoomIn").click($.proxy(function () { this.zoom(1); }, this));
+    quickTools.find(".quickZoomOut").click($.proxy(function () { this.zoom(-1); }, this));
+
+    // Create the offscreen canvas for image editing
+    this._offCanvas = document.createElement("canvas");
+
     this._mousebutton = [false, false, false];
     this._mousePos    = { x: 0, y: 0 };
 }
 
 Canvas.prototype =
 {
+    zoom: function (steps) {
+        /// <summary>Changes the zoom level of the fundus image</summary>
+        this._fundusImage.zoom(steps);
+    },
+
+    fitToPage: function () {
+        /// <summary>Fits the current fundus image, if present, to the page</summary>
+
+        if (!this._fundusImage || !this._fundusImage.baseImage) return;
+
+        var iw = this._fundusImage.baseImage.width;
+        var ih = this._fundusImage.baseImage.height;
+        var cw = this._canvasElem.width;
+        var ch = this._canvasElem.height;
+
+        var s = Math.min(cw/iw,ch/ih);
+        
+        this._fundusImage.setPosition(0, 0);
+        this._fundusImage.setZoom(s);
+
+        this.draw();
+    },
+
+    drawCached: function () {
+        /// <summary>Updates the cached image data on the offscreen canvas</summary>
+
+        // Acquire a handle to the canvas context
+        var ctx = this._offCanvas.getContext("2d");
+
+        ctx.drawImage(this._fundusImage.baseImage, 0, 0);
+
+        // Perform the image processing / annotation / effects
+        var img = ctx.getImageData(0, 0, this._offCanvas.width, this._offCanvas.height);
+        var pix = img.data;
+        FundusWeb.Image.grayscale(pix);
+        FundusWeb.Image.windowLevel(pix, this._fundusImage._window, this._fundusImage._level);
+        ctx.putImageData(img, 0, 0);
+    },
+
     draw: function () {
-        /// <summary>Redraws the image on the canvas element</summary>
+        /// <summary>Redraws the image on the visible canvas element</summary>
 
         // If there is no image set, clear the drawing canvas
         if (!this._fundusImage) {
@@ -60,48 +111,73 @@ Canvas.prototype =
         ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
         ctx.fill();
         ctx.scale(s, s);
-        ctx.drawImage(this._fundusImage.baseImage, x, y);
+        ctx.drawImage(this._offCanvas, x, y);
         ctx.restore();
-        return;
-
-        // Acquire the canvas image data
-        var img = ctx.getImageData(0, 0, this._canvasElem.width, this._canvasElem.height);
-        var pix = img.data;
-        FundusWeb.Image.windowLevel(pix, this._fundusImage._window, this._fundusImage._level);
-        ctx.putImageData(img, 0, 0);
     },
 
     setImage: function (image) {
         /// <summary>Sets the image displayed in the canvas</summary>
         /// <param name="image" type="FundusImage"></param>
 
-        $(this._fundusImage).unbind();
+        $(this._fundusImage).unbind('.Canvas');
 
         this._fundusImage = image;
 
         var canvas = this;
-        $(this._fundusImage).bind('onSegLoad', function () { canvas.draw(); });
-        $(this._fundusImage).bind('positionChanged', function () { canvas.draw(); });
-        $(this._fundusImage).bind('windowLevelChanged', function () { canvas.draw(); });
-        $(this._fundusImage).bind('zoomChanged', function () { canvas.draw(); });
 
-        this.draw();
+        // Canvas interaction which does not modify the base image data (viewing)
+        $(this._fundusImage).bind('onSegLoad.Canvas', function () { canvas.draw(); });
+        $(this._fundusImage).bind('positionChanged.Canvas', function () { canvas.draw(); });
+        $(this._fundusImage).bind('zoomChanged.Canvas', function () { canvas.draw(); });
+
+        // Canvas interaction which modifies the base image data (editing)
+        $(this._fundusImage).bind('windowLevelChanged.Canvas', function () { canvas.drawCached(); canvas.draw(); });
+
+        // Load the initial image dimensions into the canvas when first available
+        var initialDraw = function () {
+            canvas._offCanvas.width = canvas._fundusImage.baseImage.width;
+            canvas._offCanvas.height = canvas._fundusImage.baseImage.height;
+            canvas.drawCached();
+            canvas.draw();
+        };
+        if (this._fundusImage.baseImage == null) {
+            $(this._fundusImage).bind('onBaseLoad.Canvas', initialDraw);
+            canvas.draw(); // :TODO: Draw loading screen/animation/etc...
+        } else {
+            initialDraw();
+        }
     },
 
     download: function () {
         /// <summary>Downloads the annotated image to the client</summary>
 
-        // :TODO: Render to offscreen canvas of appropriate dimensions
+        // Setup the anchor element for image download
+        var canvas = this._offCanvas;
+        var a = $("<a id='link' href='#'>Download</a>");
+        a.on("click", function () {
+            $(this)
+                .attr("href", canvas.toDataURL("image/png"))
+                .attr("download", "image.png");
+        });
 
-        var iframeId = 'hiddenDownloader';
-        var iframe   = document.getElementById(hiddenIFrameID);
-        if (iframe === null) {
-            iframe = document.createElement('iframe');
-            iframe.id = hiddenIFrameID;
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-        }
-        iframe.src = this._canvasElem.toDataURL();
+        // DOM 2 Events for initiating the anchor link
+        var dispatchMouseEvent = function (target, var_args) {
+            var e = document.createEvent("MouseEvents");
+            e.initEvent.apply(e, Array.prototype.slice.call(arguments, 1));
+            target.dispatchEvent(e);
+        };
+        dispatchMouseEvent(a[0], 'mouseover', true, true);
+        dispatchMouseEvent(a[0], 'mousedown', true, true);
+        dispatchMouseEvent(a[0], 'click',     true, true);
+        dispatchMouseEvent(a[0], 'mouseup',   true, true);
+    },
+
+    print: function () {
+        /// <summary>Prints the canvas image</summary>
+
+        popup = window.open();
+        popup.document.write(this._offCanvas.toDataURL("image/png"));
+        popup.print();
     },
 
     getImage: function () {
@@ -139,9 +215,10 @@ Canvas.prototype =
 
     },
 
-// Private:
+    // Private:
     _mousebutton: [],           /// <field name='_mousebutton' type='Array'>Tracking array for mouse button status</field>
     _mousePos: { x: 0, y: 0 },  /// <field name='_mousePos'>The mouse position for the mose recent event</field>
     _fundusImage: null,         /// <field name='_fundusImage' type='FundusImage'>The image currently in this canvas</field>
     _canvasElem: null,          /// <field name='_canvasElem' type=''>The HTML canvas elemented associated with this object</field>
+    _offCanvas: null,           /// <field name='_offCanvas' type=''>An offscreen canvas for image editing</field>
 }
