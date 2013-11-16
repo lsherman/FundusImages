@@ -123,6 +123,8 @@ Page.prototype =
         }
 
         this.imageBar.reset();
+
+        this.canvas.setImage(null);
     },
 
     restore: function (state) {

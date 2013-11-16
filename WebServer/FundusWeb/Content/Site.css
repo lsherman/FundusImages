@@ -247,6 +247,54 @@ input[type="text"].error-field, input[type="password"].error-field {
         content: "»";
     }
 
+/* Quick tools bar
+----------------------------------------------------------*/
+
+.quick-tool {
+    height: 48px;
+    width: 48px !important;
+}
+
+.ui-button .ui-icon.icon-quick-fit {
+    background-image: url(../Images/icon-fit.png);
+    width:32px;
+    height:32px; 
+    left:14px;
+    top:14px;
+}
+
+.ui-button .ui-icon.icon-quick-zoom-in {
+    background-image: url(../Images/icon-zoom-in.png);
+    width:32px;
+    height:32px; 
+    left:14px;
+    top:14px;
+}
+
+.ui-button .ui-icon.icon-quick-zoom-out {
+    background-image: url(../Images/icon-zoom-out.png);
+    width:32px;
+    height:32px; 
+    left:14px;
+    top:14px;
+}
+
+.ui-button .ui-icon.icon-quick-print {
+    background-image: url(../Images/icon-print.png);
+    width:32px;
+    height:32px; 
+    left:14px;
+    top:14px;
+}
+
+.ui-button .ui-icon.icon-quick-save {
+    background-image: url(../Images/icon-save.png);
+    width:32px;
+    height:32px; 
+    left:14px;
+    top:14px;
+}
+
 /* Image toolbar
 ----------------------------------------------------------*/
 #files {
@@ -307,7 +355,22 @@ input[type="text"].error-field, input[type="password"].error-field {
     .image-thumb:active {
         border:4px solid #CCC;
     }
-    
+
+.image-rem
+{
+    font:bold 24px arial;
+    position:relative;
+    color: black;
+}
+
+    .image-rem:hover {
+        color: red;
+    }
+
+    .image-rem:active {
+        color: red;
+    }
+
 /* Action History
 ----------------------------------------------------------*/
 .history-button {
@@ -318,12 +381,12 @@ input[type="text"].error-field, input[type="password"].error-field {
     width:30%;
 
     background: #ad2929; /* Old browsers */
-    background: -moz-linear-gradient(top,  #ad2929 0%, #90d2ed 4%, #ea3e38 4%, #ea3e38 96%, #ad2929 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ad2929), color-stop(4%,#90d2ed), color-stop(4%,#ea3e38), color-stop(96%,#ea3e38), color-stop(100%,#ad2929)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  #ad2929 0%,#90d2ed 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* W3C */
+    background: -moz-linear-gradient(top,  #ad2929 0%, #ea3e38 4%, #ea3e38 4%, #ea3e38 96%, #ad2929 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ad2929), color-stop(4%,#ea3e38), color-stop(4%,#ea3e38), color-stop(96%,#ea3e38), color-stop(100%,#ad2929)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ad2929 0%,#ea3e38 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ad2929 0%,#ea3e38 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ad2929 0%,#ea3e38 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ad2929 0%,#ea3e38 4%,#ea3e38 4%,#ea3e38 96%,#ad2929 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ad2929', endColorstr='#ad2929',GradientType=0 ); /* IE6-9 */
 }
 

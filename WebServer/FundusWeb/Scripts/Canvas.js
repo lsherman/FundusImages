@@ -21,14 +21,27 @@ function Canvas(canvasElem) {
         this._mousebutton[e.which-1] = false;
     }, this));
 
-    // Handle the canvas quick-tool buttons
+    // Setup the canvas quick-tool buttons
     var quickTools = $("#quickTools");
     quickTools.buttonset();
-    quickTools.find(".quickPageFit").click($.proxy(this.fitToPage, this));
-    quickTools.find(".quickSave").click($.proxy(this.download, this));
-    quickTools.find(".quickPrint").click($.proxy(this.print, this));
-    quickTools.find(".quickZoomIn").click($.proxy(function () { this.zoom(1); }, this));
-    quickTools.find(".quickZoomOut").click($.proxy(function () { this.zoom(-1); }, this));
+    quickTools.find(".quickPageFit")
+        .button({ icons: { primary: "icon-quick-fit" }, text: false })
+        .click($.proxy(this.fitToPage, this));
+    quickTools.find(".quickSave")
+        .button({ icons: { primary: "icon-quick-save" }, text: false })
+        .click($.proxy(this.download, this));
+    quickTools.find(".quickPrint")
+        .button({ icons: { primary: "icon-quick-print" }, text: false })
+        .click($.proxy(this.print, this));
+    quickTools.find(".quickZoomIn")
+        .button({ icons: { primary: "icon-quick-zoom-in" }, text: false })
+        .click($.proxy(function () { this.zoom(5); }, this));
+    quickTools.find(".quickZoomOut")
+        .button({ icons: { primary: "icon-quick-zoom-out" }, text: false })
+        .click($.proxy(function () { this.zoom(-5); }, this));
+
+    // Hotkeys for image annotation and tools
+    $(document).keypress(this, this._keyEventHandler);
 
     // Create the offscreen canvas for image editing
     this._offCanvas = document.createElement("canvas");
@@ -41,6 +54,7 @@ Canvas.prototype =
 {
     zoom: function (steps) {
         /// <summary>Changes the zoom level of the fundus image</summary>
+        if (this._fundusImage == null) return;
         this._fundusImage.zoom(steps);
     },
 
@@ -56,8 +70,10 @@ Canvas.prototype =
 
         var s = Math.min(cw/iw,ch/ih);
         
+        this._blockRedraws = true;
         this._fundusImage.setPosition(0, 0);
         this._fundusImage.setZoom(s);
+        this._blockRedraws = false;
 
         this.draw();
     },
@@ -73,13 +89,15 @@ Canvas.prototype =
         // Perform the image processing / annotation / effects
         var img = ctx.getImageData(0, 0, this._offCanvas.width, this._offCanvas.height);
         var pix = img.data;
-        FundusWeb.Image.grayscale(pix);
+        if (this._fundusImage._grayscale) FundusWeb.Image.grayscale(pix);
         FundusWeb.Image.windowLevel(pix, this._fundusImage._window, this._fundusImage._level);
         ctx.putImageData(img, 0, 0);
     },
 
     draw: function () {
         /// <summary>Redraws the image on the visible canvas element</summary>
+
+        if (this._blockRedraws) return;
 
         // If there is no image set, clear the drawing canvas
         if (!this._fundusImage) {
@@ -115,13 +133,16 @@ Canvas.prototype =
         ctx.restore();
     },
 
-    setImage: function (image) {
+    setImage: function (image, blockHistory) {
         /// <summary>Sets the image displayed in the canvas</summary>
         /// <param name="image" type="FundusImage"></param>
 
         $(this._fundusImage).unbind('.Canvas');
 
         this._fundusImage = image;
+
+        // Detect a null image set so we can clear the view
+        if (this._fundusImage == null) { this.draw(); return; }
 
         var canvas = this;
 
@@ -131,7 +152,7 @@ Canvas.prototype =
         $(this._fundusImage).bind('zoomChanged.Canvas', function () { canvas.draw(); });
 
         // Canvas interaction which modifies the base image data (editing)
-        $(this._fundusImage).bind('windowLevelChanged.Canvas', function () { canvas.drawCached(); canvas.draw(); });
+        $(this._fundusImage).bind('dataChanged.Canvas', function () { canvas.drawCached(); canvas.draw(); });
 
         // Load the initial image dimensions into the canvas when first available
         var initialDraw = function () {
@@ -176,7 +197,7 @@ Canvas.prototype =
         /// <summary>Prints the canvas image</summary>
 
         popup = window.open();
-        popup.document.write(this._offCanvas.toDataURL("image/png"));
+        popup.document.write('<img src="' + this._offCanvas.toDataURL("image/png") + '";></img>');
         popup.print();
     },
 
@@ -211,8 +232,14 @@ Canvas.prototype =
         this._mousePos.y = e.screenY;
     },
 
-    _drawLine: function () {
-
+    _keyEventHandler: function (e) {
+        /// <param name="e" type="JQuery.Event">event</param>
+        var canvas = e.data;
+        var fundus = canvas._fundusImage;
+        
+        if (e.charCode == 103) { // G
+            fundus.setGrayscale(!fundus._grayscale);
+        }
     },
 
     // Private:
@@ -221,4 +248,31 @@ Canvas.prototype =
     _fundusImage: null,         /// <field name='_fundusImage' type='FundusImage'>The image currently in this canvas</field>
     _canvasElem: null,          /// <field name='_canvasElem' type=''>The HTML canvas elemented associated with this object</field>
     _offCanvas: null,           /// <field name='_offCanvas' type=''>An offscreen canvas for image editing</field>
+    _blockRedraws: false,       /// <field name='_blockRedraws' type='Boolean'>Blocks the draw function from being executed</field>
+}
+
+// ----------------------------------------------------------------------------
+//  Action for switching the currently displayed image
+// ----------------------------------------------------------------------------
+function SetImageAction(oldImage, newImage) {
+    this._old = oldImage;
+    this._new = newImage;
+}
+
+SetImageAction.prototype =
+{
+    text: "changing the active image",
+
+    // Private:
+
+    undo: function () {
+        WebPage.canvas.setImage(this._old, true);
+    },
+
+    redo: function () {
+        WebPage.canvas.setImage(this._new, true);
+    },
+
+    _old: null, /// <field name='_index' type='FundusImage'>The previous fundus image</field>
+    _new: null, /// <field name='_index' type='FundusImage'>The newer fundus image</field>
 }

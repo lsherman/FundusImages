@@ -25,9 +25,6 @@ function FundusImage(id, file) {
             $(this).trigger("onBaseLoad", { img: img });
         }, this);
 
-        // Present this image in the current view
-        WebPage.canvas.setImage(this);
-
         // Issue the segmentation request to the server
         $.post('api/image/segment',
             { id: this.id, data: reader.result },
@@ -80,24 +77,40 @@ FundusImage.prototype =
         /// <summary>Changes the window/level of the image</summary>
         this._window = Math.max(Math.min(window, 1.0), 0.0);
         this._level  = Math.max(Math.min(level, 1.0), 0.0);
-        $(this).trigger('windowLevelChanged', { image: this });
+        $(this).trigger('dataChanged', { image: this });
+    },
+
+    setGrayscale: function (set, suppressHistory) {
+        /// <summary>Sets the grayscale option for the fundus image</summary>
+        if (set == this._grayscale) return;
+        this._grayscale = set;
+        $(this).trigger('dataChanged', { image: this });
+        if (!suppressHistory) WebPage.history.push(new ToggleGrayscaleAction(this));
     },
 
     createUiElement: function () {
         /// <summary>Creates an HTML list element for the image bar</summary>
 
+        var image = this;
+
         // Create the HTML element for the image bar
-        var img = $("<img draggable='false' class='image-thumb'></img><div style='height:32px;'></div>");
-        img.data("Image", this);
+        var elem = $("<div id='fundus-" + image.id + "' style='width:100%'><img draggable='false' class='image-thumb'></img><div style='height:32px; width:80%; left:10%; position:relative;'><div  float:right; class='image-rem'>X</div></div>");
+
+        // Setup the image to trigger display in the canvas
+        var img = elem.find('.image-thumb');
 
         // Display the image when clicked
         img.click($.proxy(function () {
             // Check if this is already the current image
-
-            WebPage.canvas.setImage(this);
-
-            //WebPage.history.push();
+            if (WebPage.canvas.getImage != this) {
+                WebPage.canvas.setImage(this);
+            }
         }, this));
+
+        // Remove image button
+        elem.find('.image-rem').click(function () {
+            WebPage.imageBar.remove(image.id);
+        });
 
         // Set the image for the thumbnail
         if (this.baseImage == null) {
@@ -120,10 +133,10 @@ FundusImage.prototype =
             $(this).unbind("onSegError.ImageBar");
         });
 
-        return img;
+        return elem;
     },
 
-    id:        0,    /// <field name='id'         type='Number'>Unique identifier</field>
+    id:        0,    /// <field name='id'        type='Number'>Unique identifier</field>
     file:      null, /// <field name='file'      type='File'>The source file for the image</field>
     baseImage: null, /// <field name='baseImage' type='URI'>The original image dataURI, or null if unloaded</field>
     segImage:  null, /// <field name='segImage'  type='URI'>The segmented image dataURI, or null if unloaded</field>
@@ -134,4 +147,29 @@ FundusImage.prototype =
     _zoomLevel: 1.0,     /// <field name='_zoomLevel' type='Number'>Zoom scale for the image</field>
     _offset: { x: 0, y: 0 },
     _annotations: [],    /// <field name='_annotations' type='Array'>List of annotations on the image</field>
+    _grayscale: false,   /// <field name='_grayscale' type='Boolean'>Grayscale toggle option for image display</field>
+}
+
+// ----------------------------------------------------------------------------
+//  Action for toggling the image grayscale mode
+// ----------------------------------------------------------------------------
+function ToggleGrayscaleAction(image) {
+    this._image = image;
+}
+
+ToggleGrayscaleAction.prototype =
+{
+    text: "changing the grayscale mode",
+
+    // Private:
+
+    undo: function () {
+        this._image.setGrayscale(!this._image._grayscale, true);
+    },
+
+    redo: function () {
+        this._image.setGrayscale(!this._image._grayscale, true);
+    },
+
+    _image: null, /// <field name='_index' type='FundusImage'>The associated fundus image</field>
 }

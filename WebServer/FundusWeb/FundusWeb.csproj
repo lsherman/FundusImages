@@ -155,6 +155,8 @@
     </Compile>
     <Compile Include="Models\FundusImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Images\icon-print.png" />
+    <Content Include="Images\icon-save.png" />
     <Content Include="Scripts\Canvas.js" />
   </ItemGroup>
   <ItemGroup>
@@ -249,7 +251,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Images\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

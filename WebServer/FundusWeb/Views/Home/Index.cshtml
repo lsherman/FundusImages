@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <title>WebSite</title>
         @Styles.Render("~/Content/css")
-        @Styles.Render("~/Content/themes/base/css");
+        @Styles.Render("~/Content/themes/base/css")
         @Scripts.Render("~/bundles/modernizr")
     </head>
     <body style="overflow:hidden;" oncontextmenu="return false;">
@@ -18,7 +18,7 @@
                 <!-- Panel for fundus images -->
                 <div id="imageBar" style="border-right:1px solid black; border-top:1px solid black; border-bottom:1px solid black;">
                     <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/bmp" name="files[]" />
-                    <button id="uploadButton">Upload Image</button>
+                    <button id="uploadButton" title="Upload a new image">Upload Image</button>
 
                     <div id="imagePane"></div>
 
@@ -30,20 +30,22 @@
                     </div>
                 </div>
 
+                <!-- Image viewing pane -->
                 <div id="imageView" style="position:absolute; left:0; right:300px; height:100%; border:1px solid black;">
+                    <!-- Canvas element for image rendering -->
                     <canvas id="canvas" style="position:absolute; left:0; top:0;"></canvas> 
                 
                     <!-- Quick tools for the image viewer -->
-                    <div id="quickTools" style="position:absolute; right:64px; bottom:32px;">
-                        <button class="quickPageFit"/><label for="quickPageFit">F</label>
-                        <button class="quickZoomIn"/><label for="quickZoomIn">Zi</label>
-                        <button class="quickZoomOut"/><label for="quickZoomOut">Zo</label>
-                        <button class="quickSave"/><label for="quikSave">S</label>
-                        <button class="quickPrint"/><label for="quickPrint">P</label>
+                    <div id="quickTools" style="position:absolute; right:32px; bottom:32px;">
+                        <button class="quickPageFit quick-tool" title="Fit to Page"/>
+                        <button class="quickZoomIn quick-tool"  title="Zoom Out"/>
+                        <button class="quickZoomOut quick-tool" title="Zoom In"/>
+                        <button class="quickSave quick-tool"    title="Download"/>
+                        <button class="quickPrint quick-tool"   title="Print"/>
                     </div>
                 </div>
 
-                <div id="menuPanel" style="background-color: brown; overflow:hidden; position:relative; top:0; bottom:0; width:200px; right:0"></div>
+                <div id="menuPanel" style="overflow:hidden; position:relative; top:0; bottom:0; width:200px; right:0"></div>
             </div>
             <div id="messageBox"></div>
         </div>
