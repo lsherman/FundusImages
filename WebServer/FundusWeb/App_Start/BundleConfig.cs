@@ -44,6 +44,7 @@ namespace FundusWeb
                 "~/Scripts/Canvas.js",
                 "~/Scripts/FundusImage.js",
                 "~/Scripts/ImageBar.js",
+                "~/Scripts/ToolBar.js",
                 "~/Scripts/ImageProcessing.js",
                 "~/Scripts/Message.js",
                 "~/Scripts/Page.js"));

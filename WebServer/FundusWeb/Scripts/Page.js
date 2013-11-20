@@ -2,6 +2,7 @@
 /// <reference path="~/Scripts/ActionHistory.js" />
 /// <reference path="~/Scripts/FundusImage.js" />
 /// <reference path="~/Scripts/ImageBar.js" />
+/// <reference path="~/Scripts/ToolBar.js" />
 /// <reference path="~/Scripts/Message.js" />
 
 // :TODO: Document header here
@@ -46,16 +47,29 @@ Page.prototype =
         $("#undoButton").click(function () { WebPage.history.undo(); });
         $("#redoButton").click(function () { WebPage.history.redo(); });
         $("#resetButton").click(function () { WebPage.reset(); });
-        $(document).on("keypress", function (event) {
+        $(document).keyup(function (event) {
+            if (event.which == 84) { // :Debug:
+                if (WebPage._currPane == 'image') {
+                    $("#imagePane").hide();
+                    $("#toolsPane").show();
+                    WebPage._currPane = 'tools';
+                }
+                else {
+                    $("#imagePane").show();
+                    $("#toolsPane").hide();
+                    WebPage._currPane = 'image';
+                }
+            }
             if (!event.ctrlKey) return;
-            if (event.key == "z") WebPage.history.undo();
-            if (event.key == "y") WebPage.history.redo();
+            if (event.which == 89) WebPage.history.redo();
+            if (event.which == 90) WebPage.history.undo();
         });
         $(this.history).bind("onAction", this._onAction);
         this._onAction(); // Initialize state
         
         // Configure the image bar
         this.imageBar = new ImageBar();
+        this.toolBar  = new ToolBar();
 
         // Configure drag'n'drop image upload for the page
         $("#page")[0].addEventListener("dragover", function (e) { e.preventDefault(); }, false);
@@ -145,6 +159,7 @@ Page.prototype =
     history: null,  /// <field name='history' type='ActionHistory'>The action history</field>
     imageBar: null, /// <field name='imageBar' type='ImageBar'>Manages load fundus images</field>
     canvas: null,   /// <field name='canvas' type='Canvas'>Canvas used for image display/interaction</field>
+    toolBar: null,  /// <field name='toolBar' type='ToolBar'>Toolbar for fundus image editing</field>
 
     // Private:
 
@@ -187,7 +202,8 @@ Page.prototype =
         }
     },
 
-    _uidGen: 0, /// <field name='_uidGen' type='Number'>Key for generating UIDs</field>
+    _currPane: 'image', /// <field name='_currPane' type='String'>Active tool pane</field>
+    _uidGen: 0,         /// <field name='_uidGen' type='Number'>Key for generating UIDs</field>
 };
 
 // ----------------------------------------------------------------------------

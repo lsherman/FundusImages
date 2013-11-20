@@ -46,6 +46,24 @@ function FundusImage(id, file) {
 
 FundusImage.prototype =
 {
+    showBase: function (show) {
+        if (this._showBase == show) return;
+        this._showBase = show;
+        $(this).trigger('displayChanged');
+    },
+
+    showSegmented: function (show) {
+        if (this._showSegment == show) return;
+        this._showSegment = show;
+        $(this).trigger('displayChanged');
+    },
+
+    showAnnotated: function (show) {
+        if (this._showAnnotate == show) return;
+        this._showAnnotate = show;
+        $(this).trigger('displayChanged');
+    },
+
     setPosition: function (x, y) {
         /// <summary>Changes the position of the image</summary>
         this._offset.x = x;
@@ -92,12 +110,41 @@ FundusImage.prototype =
         /// <summary>Creates an HTML list element for the image bar</summary>
 
         var image = this;
+        var id    = "fundusRadio" + this.id;
 
         // Create the HTML element for the image bar
-        var elem = $("<div id='fundus-" + image.id + "' style='width:100%'><img draggable='false' class='image-thumb'></img><div style='height:32px; width:80%; left:10%; position:relative;'><div  float:right; class='image-rem'>X</div></div>");
+        var elem = $("<div id='fundus-" + image.id + "' style='width:100%; margin-bottom:5px;'>" +
+                        "<img draggable='false' class='image-thumb'></img>" +
+                        "<div style='height:32px; width:80%; left:10%; position:relative;'>" + 
+                           "<div class='fundusBSet' style='display:inline'>" +
+                              "<input id='fundusBase-"  + this.id + "' type='checkbox' " + (this._showBase ? "checked='checked'" : "")     + "></input>" +
+                              "<label for='fundusBase-" + this.id + "'>A</label>" +
+                              "<input id='fundusSeg-"   + this.id + "' type='checkbox' " + (this._showSegment ? "checked='checked'" : "")  + "></input>" +
+                              "<label for='fundusSeg-"  + this.id + "'>B</label>" +
+                              "<input id='fundusAnn-"   + this.id + "' type='checkbox' " + (this._showAnnotate ? "checked='checked'" : "") + "></input>" +
+                              "<label for='fundusAnn-"  + this.id + "'>C</label>" +
+                           "</div>" +
+                           "<div style='float:right'; class='image-rem'>X</div>" +
+                        "</div>" +
+                     "</div>"
+                     );
+
+        // Create handlers for the layer display toggles
+        elem.find("#fundusBase-" + this.id).change(function () {
+            image.showBase(this.checked);
+        });
+        elem.find("#fundusSeg-" + this.id).change(function () {
+            image.showSegmented(this.checked);
+        });
+        elem.find("#fundusAnn-" + this.id).change(function () {
+            image.showAnnotated(this.checked);
+        });
 
         // Setup the image to trigger display in the canvas
         var img = elem.find('.image-thumb');
+
+        // Setup the layer checkbox buttons
+        elem.find(".fundusBSet").buttonset();
 
         // Display the image when clicked
         img.click($.proxy(function () {
@@ -142,12 +189,14 @@ FundusImage.prototype =
     segImage:  null, /// <field name='segImage'  type='URI'>The segmented image dataURI, or null if unloaded</field>
 
     // *** Display Parameters ***
-    _window: 0.5,        /// <field name='_window' type='Array'>Window size for the image</field>
-    _level: 0.5,         /// <field name='_level' type='Number'>Level value for the image</field>
-    _zoomLevel: 1.0,     /// <field name='_zoomLevel' type='Number'>Zoom scale for the image</field>
     _offset: { x: 0, y: 0 },
-    _annotations: [],    /// <field name='_annotations' type='Array'>List of annotations on the image</field>
-    _grayscale: false,   /// <field name='_grayscale' type='Boolean'>Grayscale toggle option for image display</field>
+    _window: 0.5,         /// <field name='_window' type='Array'>Window size for the image</field>
+    _level: 0.5,          /// <field name='_level' type='Number'>Level value for the image</field>
+    _zoomLevel: 1.0,      /// <field name='_zoomLevel' type='Number'>Zoom scale for the image</field>
+    _grayscale:    false, /// <field name='_grayscale' type='Boolean'>Grayscale toggle option for image display</field>
+    _showAnnotate: true,  /// <field name='_showAnnotate' type='Boolean'>Annotation toggle option for image display</field>
+    _showSegment:  true,  /// <field name='_showSegment' type='Boolean'>Segmentation toggle option for image display</field>
+    _showBase:     true,  /// <field name='_showBase' type='Boolean'>Base image toggle option for image display</field>
 }
 
 // ----------------------------------------------------------------------------

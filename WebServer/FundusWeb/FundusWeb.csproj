@@ -237,6 +237,7 @@
     <Content Include="Scripts\Message.js" />
     <Content Include="Scripts\Support\modernizr-2.6.2.js" />
     <Content Include="Scripts\Page.js" />
+    <Content Include="Scripts\ToolBar.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

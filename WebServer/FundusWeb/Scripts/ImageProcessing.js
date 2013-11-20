@@ -12,6 +12,8 @@ FundusWeb.Image = {
         /// <param name="window" type="Number">The normalized window half-width</param>
         /// <param name="level" type="Number">The normalized level</param>
 
+        if (window > 0.9999 && level < 0.5001 && level > 0.4999) return;
+
         var min   = Math.max(level - window, 0.0);
         var max   = Math.min(level + window, 1.0);
         var range = max - min;

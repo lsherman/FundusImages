@@ -15,12 +15,18 @@
                 <div id="messageBar" style="background-color:rgb(234, 234, 234); position:absolute; right:0; width:32em; height:100%"></div>
             </div>
             <div id="main">
-                <!-- Panel for fundus images -->
+                <!-- Panel for fundus images and tools -->
                 <div id="imageBar" style="border-right:1px solid black; border-top:1px solid black; border-bottom:1px solid black;">
                     <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/bmp" name="files[]" />
                     <button id="uploadButton" title="Upload a new image">Upload Image</button>
 
-                    <div id="imagePane"></div>
+                    <div id="imagePane" class="pane"></div>
+                    
+                    <!-- Tool panel for advanced annotation / editing -->
+                    <div id="toolsPane" class="pane">
+                        <div id="toolWindowLevel" style="margin:8px;"></div>
+                        <input type="checkbox" id="toolGrayscale"/><label for="toolGrayscale">Grayscale</label>
+                    </div>
 
                     <!-- Panel for action history buttons -->
                     <div style="position:absolute; width:100%; bottom:0;">
@@ -44,8 +50,6 @@
                         <button class="quickPrint quick-tool"   title="Print"/>
                     </div>
                 </div>
-
-                <div id="menuPanel" style="overflow:hidden; position:relative; top:0; bottom:0; width:200px; right:0"></div>
             </div>
             <div id="messageBox"></div>
         </div>

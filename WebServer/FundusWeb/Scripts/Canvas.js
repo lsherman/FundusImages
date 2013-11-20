@@ -45,6 +45,7 @@ function Canvas(canvasElem) {
 
     // Create the offscreen canvas for image editing
     this._offCanvas = document.createElement("canvas");
+    this._annCanvas = document.createElement("canvas");
 
     this._mousebutton = [false, false, false];
     this._mousePos    = { x: 0, y: 0 };
@@ -129,13 +130,23 @@ Canvas.prototype =
         ctx.rect(0, 0, this._canvasElem.width, this._canvasElem.height);
         ctx.fill();
         ctx.scale(s, s);
-        ctx.drawImage(this._offCanvas, x, y);
+        if (this._fundusImage._showBase) ctx.drawImage(this._offCanvas, x, y);
+        if (this._fundusImage._showSegment && this._fundusImage.segImage) {
+            var ssx = this._fundusImage._zoomLevel * this._fundusImage.baseImage.width / this._fundusImage.segImage.width;
+            var ssy = this._fundusImage._zoomLevel * this._fundusImage.baseImage.height / this._fundusImage.segImage.height;
+            var sx = this._canvasElem.width / ssx / 2 + this._fundusImage._offset.x - this._fundusImage.segImage.width / 2;
+            var sy = this._canvasElem.height / ssy / 2 + this._fundusImage._offset.y - this._fundusImage.segImage.height / 2;
+            ctx.scale(ssx, ssy);
+            ctx.drawImage(this._fundusImage.segImage, sx, sy);
+        }
         ctx.restore();
     },
 
     setImage: function (image, blockHistory) {
         /// <summary>Sets the image displayed in the canvas</summary>
         /// <param name="image" type="FundusImage"></param>
+
+        WebPage.toolBar.populate(image);
 
         $(this._fundusImage).unbind('.Canvas');
 
@@ -150,14 +161,17 @@ Canvas.prototype =
         $(this._fundusImage).bind('onSegLoad.Canvas', function () { canvas.draw(); });
         $(this._fundusImage).bind('positionChanged.Canvas', function () { canvas.draw(); });
         $(this._fundusImage).bind('zoomChanged.Canvas', function () { canvas.draw(); });
+        $(this._fundusImage).bind('displayChanged.Canvas', function () { canvas.draw(); });
 
         // Canvas interaction which modifies the base image data (editing)
         $(this._fundusImage).bind('dataChanged.Canvas', function () { canvas.drawCached(); canvas.draw(); });
 
         // Load the initial image dimensions into the canvas when first available
         var initialDraw = function () {
-            canvas._offCanvas.width = canvas._fundusImage.baseImage.width;
+            canvas._offCanvas.width  = canvas._fundusImage.baseImage.width;  // Modified image
             canvas._offCanvas.height = canvas._fundusImage.baseImage.height;
+            canvas._annCanvas.width  = canvas._fundusImage.baseImage.width;  // Annotation overlay
+            canvas._annCanvas.height = canvas._fundusImage.baseImage.height;
             canvas.drawCached();
             canvas.draw();
         };
@@ -248,6 +262,7 @@ Canvas.prototype =
     _fundusImage: null,         /// <field name='_fundusImage' type='FundusImage'>The image currently in this canvas</field>
     _canvasElem: null,          /// <field name='_canvasElem' type=''>The HTML canvas elemented associated with this object</field>
     _offCanvas: null,           /// <field name='_offCanvas' type=''>An offscreen canvas for image editing</field>
+    _annCanvas: null,           /// <field name='_annCanvas' type=''>An offscreen canvas for image annotations</field>
     _blockRedraws: false,       /// <field name='_blockRedraws' type='Boolean'>Blocks the draw function from being executed</field>
 }
 

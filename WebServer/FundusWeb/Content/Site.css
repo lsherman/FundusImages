@@ -84,7 +84,7 @@ h5, h6 {
         width:300px;
     }
 
-    #imagePane
+    .pane
     {
         background-color:lightgray;
         position:absolute;
@@ -110,6 +110,24 @@ h5, h6 {
         line-height: normal;
         margin: 0;
         font-size: .9em;
+    }
+    
+/* 
+----------------------------------------------------------*/
+.tab {
+    border-top-left-radius:3px;
+    border-bottom-left-radius:3px;
+    border:1px solid black;
+    width:32px;
+    height:32px;
+}
+
+    .tab :hover {
+        color:aliceblue;
+    }
+    
+    .tab :active {
+        color:darkseagreen;
     }
 
 /* Site Title 
