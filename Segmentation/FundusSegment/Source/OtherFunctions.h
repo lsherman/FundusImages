@@ -13,17 +13,12 @@
 
 #include "MatlabFunctions.h"
 
-//Do an element-wise power of the matrix.
 //Passed in matrix must be of type double.
 //Modifies passed in matrix.
-void cvMatElementwisePower(cv::Mat& mat, double t);
+void enhancer(cv::Mat& mat, float t);
 
 //Passed in matrix must be of type double.
 //Modifies passed in matrix.
-void enhancer(cv::Mat& mat, double t);
-
-//Passed in matrix must be of type double.
-//Modifies passed in matrix.
-void enhancer_new(cv::Mat& mat, double t);
+void enhancer_new(cv::Mat& mat, float t);
 
 #endif /* defined(__FudusSeg_IOS__OtherFunctions__) */

@@ -1,9 +1,6 @@
 /* ===========================================================================
 
-	Project: Fundus Image Segmentation DLL
-
-	Includes common headers used by most classes. Also defines DLL export
-    and import signals.
+	Project: Fundus Image Segmentation Library
 
     Copyright (C) 2013
 
@@ -24,5 +21,44 @@
 
 =========================================================================== */
 
-// Include Headers
-#include "Common.h"
+// Begin Definition
+#ifndef FSEG_FUNDUS_SEGMENT
+#define FSEG_FUNDUS_SEGMENT
+
+// Export configurations
+#ifdef FUNDUSSEGMENT_EXPORTS
+#   define FSEG_EXPORT __declspec(dllexport)
+#else
+#   define FSEG_EXPORT __declspec(dllimport)
+#endif
+
+extern "C" 
+{
+    /** 
+     * Must be called once globally before the execution of segmentImage 
+     *
+     * @returns An error code, or 0 if successful
+     */
+    FSEG_EXPORT int startup(char const* directory);
+
+    /** 
+     * Returns a segmented version of the input image 
+     *
+     * @param data   [in]  The raw image data (jpeg, png, tiff, or bmp)
+     * @param length [in]  The length of the input image data buffer
+     * @param result [out] The output image data
+     * @param bytes  [in]  The length of the output image data buffer
+     *
+     * @returns An error code, or 0 if successful
+     */
+    FSEG_EXPORT int segmentImage(void* data, size_t length, void** result, size_t* bytes);
+
+    /** Frees memory allocated for the given image */
+    FSEG_EXPORT void freeImage(void* data);
+
+    /** Must be called before DLL unload */
+    FSEG_EXPORT void shutdown();
+}
+
+// End Definition
+#endif // FSEG_FUNDUS_SEGMENT

@@ -12,6 +12,6 @@
 // Include Headers
 #include "Common.h"
 
-cv::Mat GetStrelLength9(double angle);
+cv::Mat GetStrelLength9(float angle);
 
 #endif

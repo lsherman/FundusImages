@@ -9,61 +9,19 @@
 #include "MatlabFunctions.h"
 #include "PreCalculated.h"
 
-cv::Mat mlab_im2double(cv::Mat& mat)
-{
-    int type = mat.type();
-    
-    //If already a double matrix return it.
-    if (type == CV_64FC1)
-    {
-        return mat;
-    }
-    
-    int rows = mat.rows;
-    int cols = mat.cols;
-    cv::Mat newMat(rows, cols, CV_64FC1);
-    
-    //If an 8bit unsigned interger matrix, convert to double, scale and return it.
-    //Otherwise return the conversion to double- only.
-    if (type == CV_8UC1)
-    {
-        double scaleFactor = 1.0/255.0;
-        
-        for(int i = 0; i < rows; ++i)
-        {
-            for(int j = 0; j < cols; ++j)
-            {
-                newMat.at<double>(i, j) = (double)mat.at<UInt8>(i, j) * scaleFactor;
-            }
-        }
-    }
-    else
-    {
-        for(int i = 0; i < rows; ++i)
-        {
-            for(int j = 0; j < cols; ++j)
-            {
-                mat.convertTo(newMat, type);
-            }
-        }
-    }
-    
-    return newMat;
-}
-
 void mlab_imadjust(cv::Mat& mat)
 {
     int rows = mat.rows;
     int cols = mat.cols;
     
     //Setup array of all matrix elements to sort.
-    double* sortedArray = new double[rows*cols];
+    float* sortedArray = new float[rows*cols];
     int k = 0;
     for(int i = 0; i < rows; ++i)
     {
         for(int j = 0; j < cols; ++j)
         {
-            sortedArray[k] = mat.at<double>(i, j);
+            sortedArray[k] = mat.at<float>(i, j);
             
             ++k;
         }
@@ -74,28 +32,28 @@ void mlab_imadjust(cv::Mat& mat)
     
     int onePercentIndex = 0.01*rows*cols;
     
-    double onePercentMin = sortedArray[onePercentIndex];
-    double onePercentMax = sortedArray[rows*cols-1-onePercentIndex];
+    float onePercentMin = sortedArray[onePercentIndex];
+    float onePercentMax = sortedArray[rows*cols-1-onePercentIndex];
     
     delete [] sortedArray;
     
-    double diffInv = 1.0f/(onePercentMax - onePercentMin);
+    float diffInv = 1.0f/(onePercentMax - onePercentMin);
     
     for (int i = 0; i < rows; ++i)
     {
         for (int j = 0; j < cols; ++j)
         {
-            if (mat.at<double>(i, j) <= onePercentMin)
+            if (mat.at<float>(i, j) <= onePercentMin)
             {
-                mat.at<double>(i, j) = 0.0;
+                mat.at<float>(i, j) = 0.0;
             }
-            else if (mat.at<double>(i, j) >= onePercentMax)
+            else if (mat.at<float>(i, j) >= onePercentMax)
             {
-                mat.at<double>(i, j) = 1.0;
+                mat.at<float>(i, j) = 1.0;
             }
             else
             {
-                double newValue = (mat.at<double>(i, j) - onePercentMin) * diffInv;
+                float newValue = (mat.at<float>(i, j) - onePercentMin) * diffInv;
                 if (newValue > 1.0)
                 {
                     newValue = 1.0;
@@ -104,32 +62,15 @@ void mlab_imadjust(cv::Mat& mat)
                 {
                     newValue = 0.0;
                 }
-                mat.at<double>(i, j) = newValue;
+                mat.at<float>(i, j) = newValue;
             }
         }
     }
 }
 
-cv::Mat mlab_fspecialAverage(int width, int height)
+cv::Mat mlab_strelLine(int length, float angle)
 {
-    double avgVal = 1.0/((double)width * (double)height);
-    
-    return cv::Mat(height, width, CV_64FC1, cv::Scalar(avgVal));
-}
-
-cv::Mat mlab_filterReplicate(cv::Mat src, cv::Mat kernel)
-{
-    cv::Point anchor( -1,-1);
-    float delta = 0.0;
-    cv::Mat dest;
-    cv::filter2D(src, dest, CV_64FC1, kernel, anchor, delta, cv::BORDER_REPLICATE);
-    
-    return dest;
-}
-
-cv::Mat mlab_strelLine(int length, double angle)
-{
-    double effectiveAngle = fmod(angle, 360.0);
+    float effectiveAngle = fmod(angle, 360.0);
     
     if (effectiveAngle == 0.0 || effectiveAngle == 180.0 || effectiveAngle == -180.0)
     {
@@ -175,18 +116,13 @@ cv::Mat mlab_strelLine(int length, double angle)
     }
 }
 
-cv::Mat mlab_imtophat(cv::Mat& IM, cv::Mat& SE)
-{
-    return IM-mlab_imopen(IM, SE);
-}
-
-cv::Mat mlab_imopen(cv::Mat& IM, cv::Mat& SE)
+cv::Mat mlab_imtophat(cv::Mat const& IM, cv::Mat const& SE)
 {
     cv::Mat result;
     cv::erode(IM, result, SE);
     cv::dilate(result, result, SE);
-    
-    return result;
+
+    return IM-result;
 }
 
 //Called by mlab_bwareaopen when the beginning of a component
@@ -229,7 +165,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Top-Left
                 if (bwSeen[(currentRow-1)*cols+(currentCol-1)] == false
-                    && BW.at<double>(currentRow-1, currentCol-1) == 1.0)
+                    && BW.at<float>(currentRow-1, currentCol-1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow-1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol-1);
@@ -239,7 +175,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             
             //Top
             if (bwSeen[(currentRow-1)*cols+(currentCol)] == false
-                && BW.at<double>(currentRow-1, currentCol) == 1.0)
+                && BW.at<float>(currentRow-1, currentCol) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow-1);
                 whiteIndicesCheckNeighborCol.push_back(currentCol);
@@ -250,7 +186,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Top-Right
                 if (bwSeen[(currentRow-1)*cols+(currentCol+1)] == false
-                    && BW.at<double>(currentRow-1, currentCol+1) == 1.0)
+                    && BW.at<float>(currentRow-1, currentCol+1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow-1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol+1);
@@ -265,7 +201,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Bot-Left
                 if (bwSeen[(currentRow+1)*cols+(currentCol-1)] == false
-                    && BW.at<double>(currentRow+1, currentCol-1) == 1.0)
+                    && BW.at<float>(currentRow+1, currentCol-1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow+1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol-1);
@@ -275,7 +211,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             
             //Bot
             if (bwSeen[(currentRow+1)*cols+(currentCol)] == false
-                && BW.at<double>(currentRow+1, currentCol) == 1.0)
+                && BW.at<float>(currentRow+1, currentCol) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow+1);
                 whiteIndicesCheckNeighborCol.push_back(currentCol);
@@ -286,7 +222,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Bot-Right
                 if (bwSeen[(currentRow+1)*cols+(currentCol+1)] == false
-                    && BW.at<double>(currentRow+1, currentCol+1) == 1.0)
+                    && BW.at<float>(currentRow+1, currentCol+1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow+1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol+1);
@@ -299,7 +235,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
         {
             //Left
             if (bwSeen[(currentRow)*cols+(currentCol-1)] == false
-                && BW.at<double>(currentRow, currentCol-1) == 1.0)
+                && BW.at<float>(currentRow, currentCol-1) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow);
                 whiteIndicesCheckNeighborCol.push_back(currentCol-1);
@@ -311,7 +247,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
         {
             //Right
             if (bwSeen[(currentRow)*cols+(currentCol+1)] == false
-                && BW.at<double>(currentRow, currentCol+1) == 1.0)
+                && BW.at<float>(currentRow, currentCol+1) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow);
                 whiteIndicesCheckNeighborCol.push_back(currentCol+1);                
@@ -331,7 +267,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             whiteIndicesCheckedNeighborRow.pop_back();
             whiteIndicesCheckedNeighborCol.pop_back();
             
-            BW.at<double>(currentRow,currentCol) = 0.0;
+            BW.at<float>(currentRow,currentCol) = 0.0;
         }
     }
 }
@@ -355,7 +291,7 @@ void mlab_bwareaopen(cv::Mat& BW, int P)
             int currentIndex = i*cols + j;
             if (bwSeen[currentIndex] == false)
             {
-                if (BW.at<double>(i,j) == 1.0)
+                if (BW.at<float>(i,j) == 1.0)
                 {
                     //Found the beginning of a component
                     bwareaopenHelper(BW, P, bwSeen, i, j);
@@ -369,69 +305,4 @@ void mlab_bwareaopen(cv::Mat& BW, int P)
     }
     
     delete [] bwSeen;
-}
-
-cv::Mat mlab_medfilt2_2_2(cv::Mat& A)
-{
-    cv::Mat medFilt = A.clone();
-    
-    int rows = A.rows;
-    int cols = A.cols;
-    
-    for (int i = 0; i < rows; ++i)
-    {
-        for (int j = 0; j < cols; ++j)
-        {
-            std::vector<double> medianFinder;
-            
-            //Find the values in the 2-by-2 neighboorhood
-            //top-left
-            medianFinder.push_back(A.at<double>(i,j));
-            if (j+1 >= cols)
-            {
-                //top-right
-                medianFinder.push_back(0.0);
-                //bottom-right
-                medianFinder.push_back(0.0);
-            }
-            else
-            {
-                //top-right
-                medianFinder.push_back(A.at<double>(i,j+1));
-                if (i+1 >= rows)
-                {
-                    //bottom-right
-                    medianFinder.push_back(A.at<double>(i+1,j+1));
-                }
-                else
-                {
-                    //bottom-right
-                    medianFinder.push_back(0.0);
-                }
-            }
-            if (i+1 >= rows)
-            {
-                //bottom-left
-                medianFinder.push_back(A.at<double>(i+1,j));
-            }
-            else
-            {
-                //bottom-left
-                medianFinder.push_back(0.0);
-            }
-            
-            std::sort(medianFinder.begin(), medianFinder.end());
-            int size = medianFinder.size();
-            if (size % 2 == 0)
-            {
-                medFilt.at<double>(i,j) = 0.5*(medianFinder[size/2] + medianFinder[(size/2) + 1]);
-            }
-            else
-            {
-                medFilt.at<double>(i,j) = medianFinder[size/2];
-            }
-        }
-    }
-    
-    return medFilt;
 }

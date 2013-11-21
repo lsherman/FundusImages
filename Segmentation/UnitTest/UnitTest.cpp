@@ -2,6 +2,8 @@
 
 	Project: Fundus Image Segmentation Library
 
+    Performs unit testing for the image segmentation library
+
     Copyright (C) 2013
 
 	Lucas Sherman, email: LucasASherman@gmail.com
@@ -21,40 +23,42 @@
 
 =========================================================================== */
 
-// Begin definition
-#ifndef FSEG_COMMON_H
-#define FSEG_COMMON_H
-
-// <math.h> Include Macro
-#define _USE_MATH_DEFINES
-
-// Raw image data type
-typedef unsigned char UInt8;
-
-// OpenCV Headers
-#include "opencv/cv.h"
-#include "opencv/cvwimage.h"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/imgproc/imgproc_c.h"
-#include "opencv2/opencv.hpp"
+// Include Header
+#include "FundusSegment.h"
 
 // STD Standard Includes
-#include <algorithm>
-#include <deque>
-#include <exception>
-#include <functional>
 #include <fstream>
 #include <iostream>
-#include <iterator>
-#include <limits>
-#include <list>
-#include <map>
-#include <math.h>
 #include <memory>
-#include <sstream>
-#include <stack>
-#include <string>
 #include <vector>
 
-// End definition
-#endif // FSEG_COMMON_H
+int main(int argc, char* argv[])
+{
+    startup("./");
+
+    // Load the test image from memory
+    std::ifstream is("testImage.png", std::ios_base::binary | std::ios::ate);
+    auto length = is.tellg();
+    is.seekg(std::ios_base::beg);
+    auto image = new char[length];
+    is.read(image, length);
+    is.close();
+
+    // Perform the segmentation
+    void * outputImage; size_t bytes;
+    auto error = segmentImage(image, length, &outputImage, &bytes);
+    if (error) return 1;
+    delete[] image;
+
+    // Write the output back to disk
+    std::ofstream of("outputImage.jpg", std::ios::binary);
+    of.write((char*)outputImage, bytes);
+    of.close();
+
+    freeImage(outputImage);
+
+    shutdown();
+
+	return 0;
+}
+

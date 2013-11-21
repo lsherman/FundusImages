@@ -8,7 +8,7 @@
 
 #include "PreCalculated.h"
 
-cv::Mat GetStrelLength9(double angle)
+cv::Mat GetStrelLength9(float angle)
 {
     if (angle == 15.0)
     {
