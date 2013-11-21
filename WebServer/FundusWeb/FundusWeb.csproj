@@ -154,6 +154,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\FundusImage.cs" />
+    <Compile Include="Models\FundusSegment.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Images\icon-print.png" />
     <Content Include="Images\icon-save.png" />
@@ -272,7 +273,7 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerPort>8642</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:61736/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
