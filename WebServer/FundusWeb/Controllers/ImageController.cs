@@ -30,6 +30,7 @@ namespace FundusWeb.Controllers
 
             // **
             // Call the segmentation service to segment the image
+            // :TODO: Get ride of the marshalling here and just compile for unsafe?
             // **
             var appdir = HttpContext.Current.Server.MapPath("~");
             var ibytes = Convert.FromBase64String(data);
@@ -45,6 +46,8 @@ namespace FundusWeb.Controllers
             var dataUrl    = "data:image/jpeg"
                 + ";base64," 
                 + ob64String;
+
+            FundusSegment.freeImage(outStr);
 
             return new FundusImage { id = image.id, data = dataUrl };
         }

@@ -1,4 +1,4 @@
-﻿/// <reference path="~/Scripts/Support/_reference.js" />
+﻿/// <reference path="~/Scripts/Support/_references.js" />
 /// <reference path="~/Scripts/ActionHistory.js" />
 /// <reference path="~/Scripts/FundusImage.js" />
 /// <reference path="~/Scripts/ImageBar.js" />

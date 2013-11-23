@@ -132,10 +132,10 @@ Canvas.prototype =
         ctx.scale(s, s);
         if (this._fundusImage._showBase) ctx.drawImage(this._offCanvas, x, y);
         if (this._fundusImage._showSegment && this._fundusImage.segImage) {
-            var ssx = this._fundusImage._zoomLevel * this._fundusImage.baseImage.width / this._fundusImage.segImage.width;
-            var ssy = this._fundusImage._zoomLevel * this._fundusImage.baseImage.height / this._fundusImage.segImage.height;
-            var sx = this._canvasElem.width / ssx / 2 + this._fundusImage._offset.x - this._fundusImage.segImage.width / 2;
-            var sy = this._canvasElem.height / ssy / 2 + this._fundusImage._offset.y - this._fundusImage.segImage.height / 2;
+            var ssx = this._fundusImage.baseImage.width / this._fundusImage.segImage.width;
+            var ssy = this._fundusImage.baseImage.height / this._fundusImage.segImage.height;
+            var sx = this._canvasElem.width  / ssx / s / 2 + this._fundusImage._offset.x / ssx - this._fundusImage.segImage.width / 2;
+            var sy = this._canvasElem.height / ssy / s / 2 + this._fundusImage._offset.y / ssy - this._fundusImage.segImage.height / 2;
             ctx.scale(ssx, ssy);
             ctx.drawImage(this._fundusImage.segImage, sx, sy);
         }

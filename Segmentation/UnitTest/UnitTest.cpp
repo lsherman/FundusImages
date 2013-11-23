@@ -34,7 +34,8 @@
 
 int main(int argc, char* argv[])
 {
-    startup("./");
+    std::string directory("./");
+    startup(directory.c_str());
 
     // Load the test image from memory
     std::ifstream is("testImage.png", std::ios_base::binary | std::ios::ate);
@@ -51,7 +52,7 @@ int main(int argc, char* argv[])
     delete[] image;
 
     // Write the output back to disk
-    std::ofstream of("outputImage.jpg", std::ios::binary);
+    std::ofstream of("outputImage.png", std::ios::binary);
     of.write((char*)outputImage, bytes);
     of.close();
 

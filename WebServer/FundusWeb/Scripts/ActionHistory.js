@@ -1,4 +1,4 @@
-﻿/// <reference path="~/Scripts/jquery-2.0.3.js" />
+﻿/// <reference path="~/Scripts/_references.js" />
 
 // :TODO: Document header here
 

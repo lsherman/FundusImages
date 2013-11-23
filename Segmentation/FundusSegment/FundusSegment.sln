@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FundusSegment", "FundusSegment.vcxproj", "{D43826AB-8303-484B-ACE2-DD155C795F85}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "..\UnitTest\UnitTest.vcxproj", "{4765A6B8-DA4E-4F67-A613-E10606876EC6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D43826AB-8303-484B-ACE2-DD155C795F85} = {D43826AB-8303-484B-ACE2-DD155C795F85}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

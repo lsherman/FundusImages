@@ -21,9 +21,6 @@ void mlab_imadjust(cv::Mat& mat);
 //The line is composed of 1's and the rest are 0's.
 cv::Mat mlab_strelLine(int length, float angle);
 
-//Top hat filtering
-cv::Mat mlab_imtophat(cv::Mat const& IM, cv::Mat const& SE);
-
 //Removes from a binary image all connected components (objects)
 //that have fewer than P pixels.
 //BW is a matrix of type float and will be modified.

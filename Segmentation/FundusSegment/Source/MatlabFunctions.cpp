@@ -9,19 +9,21 @@
 #include "MatlabFunctions.h"
 #include "PreCalculated.h"
 
+#define DATA_TYPE float
+
 void mlab_imadjust(cv::Mat& mat)
 {
     int rows = mat.rows;
     int cols = mat.cols;
     
     //Setup array of all matrix elements to sort.
-    float* sortedArray = new float[rows*cols];
+    DATA_TYPE* sortedArray = new DATA_TYPE[rows*cols];
     int k = 0;
     for(int i = 0; i < rows; ++i)
     {
         for(int j = 0; j < cols; ++j)
         {
-            sortedArray[k] = mat.at<float>(i, j);
+            sortedArray[k] = mat.at<DATA_TYPE>(i, j);
             
             ++k;
         }
@@ -32,8 +34,8 @@ void mlab_imadjust(cv::Mat& mat)
     
     int onePercentIndex = 0.01*rows*cols;
     
-    float onePercentMin = sortedArray[onePercentIndex];
-    float onePercentMax = sortedArray[rows*cols-1-onePercentIndex];
+    DATA_TYPE onePercentMin = sortedArray[onePercentIndex];
+    DATA_TYPE onePercentMax = sortedArray[rows*cols-1-onePercentIndex];
     
     delete [] sortedArray;
     
@@ -43,17 +45,17 @@ void mlab_imadjust(cv::Mat& mat)
     {
         for (int j = 0; j < cols; ++j)
         {
-            if (mat.at<float>(i, j) <= onePercentMin)
+            if (mat.at<DATA_TYPE>(i, j) <= onePercentMin)
             {
-                mat.at<float>(i, j) = 0.0;
+                mat.at<DATA_TYPE>(i, j) = 0.0;
             }
-            else if (mat.at<float>(i, j) >= onePercentMax)
+            else if (mat.at<DATA_TYPE>(i, j) >= onePercentMax)
             {
-                mat.at<float>(i, j) = 1.0;
+                mat.at<DATA_TYPE>(i, j) = 1.0;
             }
             else
             {
-                float newValue = (mat.at<float>(i, j) - onePercentMin) * diffInv;
+                float newValue = (mat.at<DATA_TYPE>(i, j) - onePercentMin) * diffInv;
                 if (newValue > 1.0)
                 {
                     newValue = 1.0;
@@ -62,7 +64,7 @@ void mlab_imadjust(cv::Mat& mat)
                 {
                     newValue = 0.0;
                 }
-                mat.at<float>(i, j) = newValue;
+                mat.at<DATA_TYPE>(i, j) = newValue;
             }
         }
     }
@@ -116,15 +118,6 @@ cv::Mat mlab_strelLine(int length, float angle)
     }
 }
 
-cv::Mat mlab_imtophat(cv::Mat const& IM, cv::Mat const& SE)
-{
-    cv::Mat result;
-    cv::erode(IM, result, SE);
-    cv::dilate(result, result, SE);
-
-    return IM-result;
-}
-
 //Called by mlab_bwareaopen when the beginning of a component
 //is found. The whole component will be removed from BW if
 //it consists of less than P pixels.
@@ -165,7 +158,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Top-Left
                 if (bwSeen[(currentRow-1)*cols+(currentCol-1)] == false
-                    && BW.at<float>(currentRow-1, currentCol-1) == 1.0)
+                    && BW.at<DATA_TYPE>(currentRow-1, currentCol-1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow-1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol-1);
@@ -175,7 +168,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             
             //Top
             if (bwSeen[(currentRow-1)*cols+(currentCol)] == false
-                && BW.at<float>(currentRow-1, currentCol) == 1.0)
+                && BW.at<DATA_TYPE>(currentRow-1, currentCol) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow-1);
                 whiteIndicesCheckNeighborCol.push_back(currentCol);
@@ -186,7 +179,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Top-Right
                 if (bwSeen[(currentRow-1)*cols+(currentCol+1)] == false
-                    && BW.at<float>(currentRow-1, currentCol+1) == 1.0)
+                    && BW.at<DATA_TYPE>(currentRow-1, currentCol+1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow-1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol+1);
@@ -201,7 +194,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Bot-Left
                 if (bwSeen[(currentRow+1)*cols+(currentCol-1)] == false
-                    && BW.at<float>(currentRow+1, currentCol-1) == 1.0)
+                    && BW.at<DATA_TYPE>(currentRow+1, currentCol-1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow+1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol-1);
@@ -211,7 +204,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             
             //Bot
             if (bwSeen[(currentRow+1)*cols+(currentCol)] == false
-                && BW.at<float>(currentRow+1, currentCol) == 1.0)
+                && BW.at<DATA_TYPE>(currentRow+1, currentCol) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow+1);
                 whiteIndicesCheckNeighborCol.push_back(currentCol);
@@ -222,7 +215,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             {
                 //Bot-Right
                 if (bwSeen[(currentRow+1)*cols+(currentCol+1)] == false
-                    && BW.at<float>(currentRow+1, currentCol+1) == 1.0)
+                    && BW.at<DATA_TYPE>(currentRow+1, currentCol+1) == 1.0)
                 {
                     whiteIndicesCheckNeighborRow.push_back(currentRow+1);
                     whiteIndicesCheckNeighborCol.push_back(currentCol+1);
@@ -235,7 +228,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
         {
             //Left
             if (bwSeen[(currentRow)*cols+(currentCol-1)] == false
-                && BW.at<float>(currentRow, currentCol-1) == 1.0)
+                && BW.at<DATA_TYPE>(currentRow, currentCol-1) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow);
                 whiteIndicesCheckNeighborCol.push_back(currentCol-1);
@@ -247,7 +240,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
         {
             //Right
             if (bwSeen[(currentRow)*cols+(currentCol+1)] == false
-                && BW.at<float>(currentRow, currentCol+1) == 1.0)
+                && BW.at<DATA_TYPE>(currentRow, currentCol+1) == 1.0)
             {
                 whiteIndicesCheckNeighborRow.push_back(currentRow);
                 whiteIndicesCheckNeighborCol.push_back(currentCol+1);                
@@ -267,7 +260,7 @@ void bwareaopenHelper(cv::Mat& BW, int P, bool* bwSeen, int startRowIndx, int st
             whiteIndicesCheckedNeighborRow.pop_back();
             whiteIndicesCheckedNeighborCol.pop_back();
             
-            BW.at<float>(currentRow,currentCol) = 0.0;
+            BW.at<DATA_TYPE>(currentRow,currentCol) = 0.0;
         }
     }
 }
@@ -291,7 +284,7 @@ void mlab_bwareaopen(cv::Mat& BW, int P)
             int currentIndex = i*cols + j;
             if (bwSeen[currentIndex] == false)
             {
-                if (BW.at<float>(i,j) == 1.0)
+                if (BW.at<DATA_TYPE>(i,j) == 1.0)
                 {
                     //Found the beginning of a component
                     bwareaopenHelper(BW, P, bwSeen, i, j);
