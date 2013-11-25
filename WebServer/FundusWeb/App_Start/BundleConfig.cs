@@ -39,6 +39,19 @@ namespace FundusWeb
                 "~/Content/themes/base/jquery.ui.progressbar.css",
                 "~/Content/themes/base/jquery.ui.theme.css"));
 
+            bundles.Add(new ScriptBundle("~/bundles/hammer").Include(
+                "~/Scripts/Hammer/core.js",
+                "~/Scripts/Hammer/detection.js",
+                "~/Scripts/Hammer/event.js",
+                "~/Scripts/Hammer/gestures.js",
+                "~/Scripts/Hammer/instance.js",
+                "~/Scripts/Hammer/intro.js",
+                "~/Scripts/Hammer/outro.js",
+                "~/Scripts/Hammer/pointerevent.js",
+                "~/Scripts/Hammer/setup.js",
+                "~/Scripts/Hammer/utils.js"
+                ));
+
             bundles.Add(new ScriptBundle("~/bundles/page").Include(
                 "~/Scripts/ActionHistory.js",
                 "~/Scripts/Canvas.js",

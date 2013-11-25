@@ -24,6 +24,10 @@ function Page() {
     } else {
         alert('The Print API is not supported in this browser.');
     }
+
+    $(document).disableSelection();
+    document.onselectstart = function () { return false; } // ie
+    document.onmousedown   = function () { return false; } // others
 };
 
 Page.prototype =

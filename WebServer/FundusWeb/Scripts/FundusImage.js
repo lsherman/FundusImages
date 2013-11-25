@@ -116,35 +116,13 @@ FundusImage.prototype =
         var elem = $("<div id='fundus-" + image.id + "' style='width:100%; margin-bottom:5px;'>" +
                         "<img draggable='false' class='image-thumb'></img>" +
                         "<div style='height:32px; width:80%; left:10%; position:relative;'>" + 
-                           "<div class='fundusBSet' style='display:inline'>" +
-                              "<input id='fundusBase-"  + this.id + "' type='checkbox' " + (this._showBase ? "checked='checked'" : "")     + "></input>" +
-                              "<label for='fundusBase-" + this.id + "'>A</label>" +
-                              "<input id='fundusSeg-"   + this.id + "' type='checkbox' " + (this._showSegment ? "checked='checked'" : "")  + "></input>" +
-                              "<label for='fundusSeg-"  + this.id + "'>B</label>" +
-                              "<input id='fundusAnn-"   + this.id + "' type='checkbox' " + (this._showAnnotate ? "checked='checked'" : "") + "></input>" +
-                              "<label for='fundusAnn-"  + this.id + "'>C</label>" +
-                           "</div>" +
                            "<div style='float:right'; class='image-rem'>X</div>" +
                         "</div>" +
                      "</div>"
                      );
 
-        // Create handlers for the layer display toggles
-        elem.find("#fundusBase-" + this.id).change(function () {
-            image.showBase(this.checked);
-        });
-        elem.find("#fundusSeg-" + this.id).change(function () {
-            image.showSegmented(this.checked);
-        });
-        elem.find("#fundusAnn-" + this.id).change(function () {
-            image.showAnnotated(this.checked);
-        });
-
         // Setup the image to trigger display in the canvas
         var img = elem.find('.image-thumb');
-
-        // Setup the layer checkbox buttons
-        elem.find(".fundusBSet").buttonset();
 
         // Display the image when clicked
         img.click($.proxy(function () {

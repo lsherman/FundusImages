@@ -21,6 +21,52 @@ function Canvas(canvasElem) {
         this._mousebutton[e.which-1] = false;
     }, this));
 
+    // Initialize the Hammer gesture detection library
+    if (Modernizr.touch) {
+        var hammertime = Hammer(canvasElem, {
+            transform_always_block: true,
+            transform_min_scale: 1,
+            drag_block_horizontal: true,
+            drag_block_vertical: true,
+            drag_min_distance: 0
+        });
+
+        var last_scale, last_posx, last_posy;
+        hammertime.on('touch drag transform', function (ev) {
+            switch (ev.type) {
+                case 'touch':
+                    WebPage.canvas.last_scale = WebPage.canvas._fundusImage._zoomLevel;
+                    WebPage.canvas.last_posx = WebPage.canvas._fundusImage._offset.x;
+                    WebPage.canvas.last_posy = WebPage.canvas._fundusImage._offset.y;
+                    break;
+
+                case 'drag':
+                    WebPage.canvas._fundusImage.setPosition(
+                        WebPage.canvas.last_posx + ev.gesture.deltaX / WebPage.canvas._fundusImage._zoomLevel,
+                        WebPage.canvas.last_posy + ev.gesture.deltaY / WebPage.canvas._fundusImage._zoomLevel);
+                    break;
+
+                case 'transform':
+                    var scale = WebPage.canvas.last_scale * ev.gesture.scale;
+                    WebPage.canvas._fundusImage.setZoom(scale);
+                    break;
+            }
+        });
+    }
+
+    // Setup the canvas display buttons
+    var dispButtons = $("#dispTools");
+    dispButtons.buttonset();
+    dispButtons.find("#dispBase")
+        .button({ icons: { primary: "icon-show-base" }, text: false })
+        .click(function () { WebPage.canvas._fundusImage.showBase(this.checked); });
+    dispButtons.find("#dispSeg")
+        .button({ icons: { primary: "icon-show-segment" }, text: false })
+        .click(function () { WebPage.canvas._fundusImage.showSegmented(this.checked); });
+    dispButtons.find("#dispAnn")
+        .button({ icons: { primary: "icon-show-annotate" }, text: false })
+        .click(function () { WebPage.canvas._fundusImage.showAnnotated(this.checked); });
+       
     // Setup the canvas quick-tool buttons
     var quickTools = $("#quickTools");
     quickTools.buttonset();
@@ -89,9 +135,7 @@ Canvas.prototype =
 
         // Perform the image processing / annotation / effects
         var img = ctx.getImageData(0, 0, this._offCanvas.width, this._offCanvas.height);
-        var pix = img.data;
-        if (this._fundusImage._grayscale) FundusWeb.Image.grayscale(pix);
-        FundusWeb.Image.windowLevel(pix, this._fundusImage._window, this._fundusImage._level);
+        FundusWeb.Image.process(this._fundusImage, img);
         ctx.putImageData(img, 0, 0);
     },
 
@@ -156,6 +200,11 @@ Canvas.prototype =
         if (this._fundusImage == null) { this.draw(); return; }
 
         var canvas = this;
+
+        // Update the status of the layer display buttons
+        $("#dispBase").prop('checked', this._fundusImage._showBase).button("refresh");
+        $("#dispAnn").prop('checked', this._fundusImage._showAnnotate).button("refresh");
+        $("#dispSeg").prop('checked', this._fundusImage._showSegment).button("refresh");
 
         // Canvas interaction which does not modify the base image data (viewing)
         $(this._fundusImage).bind('onSegLoad.Canvas', function () { canvas.draw(); });
@@ -224,6 +273,8 @@ Canvas.prototype =
     _onMouseMove: function (e) {
         /// <param name="e" type="JQuery.Event">event</param>
 
+        e.preventDefault()
+
         if (!this._fundusImage) return;
 
         var scale = this._fundusImage._zoomLevel;
@@ -258,7 +309,8 @@ Canvas.prototype =
 
     // Private:
     _mousebutton: [],           /// <field name='_mousebutton' type='Array'>Tracking array for mouse button status</field>
-    _mousePos: { x: 0, y: 0 },  /// <field name='_mousePos'>The mouse position for the mose recent event</field>
+    _mousePos: { x: 0, y: 0 },  /// <field name='_mousePos'>The mouse position for the most recent event</field>
+    _touchPos: { x: 0, y: 0 },  /// <field name='_mousePos'>The touch position for the most recent event</field>
     _fundusImage: null,         /// <field name='_fundusImage' type='FundusImage'>The image currently in this canvas</field>
     _canvasElem: null,          /// <field name='_canvasElem' type=''>The HTML canvas elemented associated with this object</field>
     _offCanvas: null,           /// <field name='_offCanvas' type=''>An offscreen canvas for image editing</field>

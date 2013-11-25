@@ -49,6 +49,13 @@
                         <button class="quickSave quick-tool"    title="Download"/>
                         <button class="quickPrint quick-tool"   title="Print"/>
                     </div>
+
+                    <!-- Display tools for the image viewer -->
+                    <div id="dispTools" style="position:absolute; left:32px; bottom:32px; width:200px; height:48px;">
+                        <input id="dispBase" type="checkbox" title="Display the original image"/><label class="quick-tool" for="dispBase"></label>
+                        <input id="dispSeg" type="checkbox" title="Display the segmented image"/><label class="quick-tool" for="dispSeg"></label>
+                        <input id="dispAnn" type="checkbox" title="Display the annotation layer"/><label class="quick-tool" for="dispAnn"></label>
+                    </div>
                 </div>
             </div>
             <div id="messageBox"></div>
@@ -56,6 +63,7 @@
     </body>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/hammer")
     @Scripts.Render("~/bundles/page")
     <script>
         WebPage = new Page();
