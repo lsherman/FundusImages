@@ -46,21 +46,24 @@ function FundusImage(id, file) {
 
 FundusImage.prototype =
 {
-    showBase: function (show) {
+    showBase: function (show, suppressHistory) {
         if (this._showBase == show) return;
         this._showBase = show;
+        if (!suppressHistory) WebPage.history.push(new ToggleLayerVisibility(this, 'base'));
         $(this).trigger('displayChanged');
     },
 
-    showSegmented: function (show) {
+    showSegmented: function (show, suppressHistory) {
         if (this._showSegment == show) return;
         this._showSegment = show;
+        if (!suppressHistory) WebPage.history.push(new ToggleLayerVisibility(this, 'segmentation'));
         $(this).trigger('displayChanged');
     },
 
-    showAnnotated: function (show) {
+    showAnnotated: function (show, suppressHistory) {
         if (this._showAnnotate == show) return;
         this._showAnnotate = show;
+        if (!suppressHistory) WebPage.history.push(new ToggleLayerVisibility(this, 'annotation'));
         $(this).trigger('displayChanged');
     },
 
@@ -197,6 +200,41 @@ ToggleGrayscaleAction.prototype =
     redo: function () {
         this._image.setGrayscale(!this._image._grayscale, true);
     },
+
+    _image: null, /// <field name='_index' type='FundusImage'>The associated fundus image</field>
+}
+
+// ----------------------------------------------------------------------------
+//  Action for toggling the image layer visibility
+// ----------------------------------------------------------------------------
+function ToggleLayerVisibility(image, layer) {
+    this._image = image;
+    this._layer = layer;
+    this.redo   = this.undo;
+    this.text   = "Changing the image's " + layer + " layer visibility";
+}
+
+ToggleLayerVisibility.prototype =
+{
+    text: null,
+
+    // Private:
+
+    undo: function () {
+        switch (this._layer) {
+            case 'segmentation':
+                this._image.showSegmented(!this._image._showSegment, true);
+                break;
+            case 'annotation':
+                this._image.showAnnotated(!this._image._showAnnotate, true);
+                break;
+            case 'base':
+                this._image.showBase(!this._image._showBase, true);
+                break;
+        }
+    },
+
+    redo: null,
 
     _image: null, /// <field name='_index' type='FundusImage'>The associated fundus image</field>
 }

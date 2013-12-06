@@ -2,7 +2,16 @@
 /// <reference path="~/Scripts/FundusImage.js" />
 /// <reference path="~/Scripts/ImageProcessing.js" />
 
-// :TODO: Document header here
+// ----------------------------------------------------------------------------
+//  Canvas tool type enumeration
+// ----------------------------------------------------------------------------
+CanvasTool = {
+    cursor: 0,  ///< Image drag tool
+    brush:  1,  ///< Paint brush tool
+    zoom:   2,  ///< Zoom in/out with drag
+    text:   3,  ///< Insert text label
+    range:  4
+};
 
 // ----------------------------------------------------------------------------
 //  Creates a canvas element for displaying and annotating an image
@@ -20,6 +29,9 @@ function Canvas(canvasElem) {
     canvas.on('mouseup', $.proxy(function (e) {
         this._mousebutton[e.which-1] = false;
     }, this));
+    
+    // Get the canvas offset for event position detection
+    this._offset = canvas.offset();
 
     // Initialize the Hammer gesture detection library
     if (Modernizr.touch) {
@@ -31,8 +43,7 @@ function Canvas(canvasElem) {
             drag_min_distance: 0
         });
 
-        var last_scale, last_posx, last_posy;
-        hammertime.on('touch drag transform', function (ev) {
+        hammertime.on('touch drag transform hold', function (ev) {
             switch (ev.type) {
                 case 'touch':
                     WebPage.canvas.last_scale = WebPage.canvas._fundusImage._zoomLevel;
@@ -50,6 +61,10 @@ function Canvas(canvasElem) {
                     var scale = WebPage.canvas.last_scale * ev.gesture.scale;
                     WebPage.canvas._fundusImage.setZoom(scale);
                     break;
+
+                case 'hold':
+                    WebPage.contextMenu.open(ev.target);
+                    break;
             }
         });
     }
@@ -66,6 +81,7 @@ function Canvas(canvasElem) {
     dispButtons.find("#dispAnn")
         .button({ icons: { primary: "icon-show-annotate" }, text: false })
         .click(function () { WebPage.canvas._fundusImage.showAnnotated(this.checked); });
+    dispButtons.find("label").unbind("mouseup"); // Prevent block of click-drag-release
        
     // Setup the canvas quick-tool buttons
     var quickTools = $("#quickTools");
@@ -99,6 +115,10 @@ function Canvas(canvasElem) {
 
 Canvas.prototype =
 {
+    setTool: function (tool) {
+        this._tool = tool;
+    },
+
     zoom: function (steps) {
         /// <summary>Changes the zoom level of the fundus image</summary>
         if (this._fundusImage == null) return;
@@ -175,6 +195,7 @@ Canvas.prototype =
         ctx.fill();
         ctx.scale(s, s);
         if (this._fundusImage._showBase) ctx.drawImage(this._offCanvas, x, y);
+        if (this._fundusImage._showAnnotate) ctx.drawImage(this._annCanvas, x, y);
         if (this._fundusImage._showSegment && this._fundusImage.segImage) {
             var ssx = this._fundusImage.baseImage.width / this._fundusImage.segImage.width;
             var ssy = this._fundusImage.baseImage.height / this._fundusImage.segImage.height;
@@ -236,13 +257,12 @@ Canvas.prototype =
         /// <summary>Downloads the annotated image to the client</summary>
 
         // Setup the anchor element for image download
-        var canvas = this._offCanvas;
+        var canvas = this._canvasElem;
         var a = $("<a id='link' href='#'>Download</a>");
-        a.on("click", function () {
-            $(this)
-                .attr("href", canvas.toDataURL("image/png"))
-                .attr("download", "image.png");
-        });
+        a.on("click", $.proxy(function () {
+            a.attr("href", this._getDataUrl())
+             .attr("download", "Fundus Image.png");
+        }, this));
 
         // DOM 2 Events for initiating the anchor link
         var dispatchMouseEvent = function (target, var_args) {
@@ -260,8 +280,10 @@ Canvas.prototype =
         /// <summary>Prints the canvas image</summary>
 
         popup = window.open();
-        popup.document.write('<img src="' + this._offCanvas.toDataURL("image/png") + '";></img>');
+        popup.document.write('<img src="' + this._getDataUrl() + '";></img>');
+        popup.document.close();
         popup.print();
+        popup.close();
     },
 
     getImage: function () {
@@ -270,12 +292,35 @@ Canvas.prototype =
 
 // Private:
 
-    _onMouseMove: function (e) {
+    _getDataUrl: function () {
+        /// <summary>Returns a data URL of the current canvas image</summary>
+
+        var ctx = this._offCanvas.getContext("2d");
+
+        if (!this._fundusImage._showBase) {
+            ctx.fillStyle = "#000000";
+            ctx.rect(0, 0, this._offCanvas.width, this._offCanvas.height);
+            ctx.fill();
+        }
+
+        if (this._fundusImage._showSegment)  ctx.drawImage(this._fundusImage.segImage, 0, 0);
+        if (this._fundusImage._showAnnotate) ctx.drawImage(this._annCanvas, 0, 0);
+
+        var url = this._offCanvas.toDataURL();
+
+        this.drawCached();
+
+        return url;
+    },
+
+    _onMouseMove: function (e, ui) {
         /// <param name="e" type="JQuery.Event">event</param>
 
         e.preventDefault()
 
         if (!this._fundusImage) return;
+
+        if (!this._mousebutton[0]) return;
 
         var scale = this._fundusImage._zoomLevel;
         var moveX = this._mousePos.x - e.screenX;
@@ -283,18 +328,44 @@ Canvas.prototype =
         moveX /= scale;
         moveY /= scale;
 
-        // Apply active tool on left button
-        if (this._mousebutton[0]) {
-            var window = moveX / 500.0 + this._fundusImage._window;
-            var level  = moveY / 500.0 + this._fundusImage._level;
-            this._fundusImage.setWindowLevel(window, level);
+        switch (this._tool) {
+            case CanvasTool.cursor:
+                this._fundusImage.move(-moveX, -moveY);
+                break;
+            case CanvasTool.brush:
+                var c = $(this._canvasElem);
+                var s = this._fundusImage._zoomLevel;
+                var o = this._fundusImage._offset;
+                var i = this._fundusImage.baseImage;
+                var x = e.clientX - c.width() / 2 + s * (i.width / 2 - o.x) - 1;
+                var y = e.clientY - c.height() / 2 + s * (i.height / 2 - o.y) - 26;
+                this._drawLine(this._annCanvas, x, y, x + moveX, y + moveY);
+                this.draw();
+                break;
+            case CanvasTool.zoom:
+                this._fundusImage.zoom(moveY);
+                break;
+            case CanvasTool.range:
+                var window = moveX / 500.0 + this._fundusImage._window;
+                var level = moveY / 500.0 + this._fundusImage._level;
+                this._fundusImage.setWindowLevel(window, level);
+                break;
         }
-
-        // Drag image on right button
-        if (this._mousebutton[2]) this._fundusImage.move(-moveX, -moveY);
 
         this._mousePos.x = e.screenX;
         this._mousePos.y = e.screenY;
+    },
+
+    _drawLine: function (canvas, x1, y1, x2, y2) {
+        /// <param name="e" type="JQuery.Event">event</param>
+        ctx = canvas.getContext("2d");
+        ctx.strokeStyle = '#FFF';
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        ctx.closePath();
     },
 
     _keyEventHandler: function (e) {
@@ -316,6 +387,7 @@ Canvas.prototype =
     _offCanvas: null,           /// <field name='_offCanvas' type=''>An offscreen canvas for image editing</field>
     _annCanvas: null,           /// <field name='_annCanvas' type=''>An offscreen canvas for image annotations</field>
     _blockRedraws: false,       /// <field name='_blockRedraws' type='Boolean'>Blocks the draw function from being executed</field>
+    _tool: CanvasTool.cursor,   /// <field name='_blockRedraws' type='Boolean'></field>
 }
 
 // ----------------------------------------------------------------------------

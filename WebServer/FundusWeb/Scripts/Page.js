@@ -1,5 +1,7 @@
 ﻿/// <reference path="~/Scripts/Support/_references.js" />
 /// <reference path="~/Scripts/ActionHistory.js" />
+/// <reference path="~/Scripts/Canvas.js" />
+/// <reference path="~/Scripts/ContextMenu.js" />
 /// <reference path="~/Scripts/FundusImage.js" />
 /// <reference path="~/Scripts/ImageBar.js" />
 /// <reference path="~/Scripts/ToolBar.js" />
@@ -52,18 +54,6 @@ Page.prototype =
         $("#redoButton").click(function () { WebPage.history.redo(); });
         $("#resetButton").click(function () { WebPage.reset(); });
         $(document).keyup(function (event) {
-            if (event.which == 84) { // :Debug:
-                if (WebPage._currPane == 'image') {
-                    $("#imagePane").hide();
-                    $("#toolsPane").show();
-                    WebPage._currPane = 'tools';
-                }
-                else {
-                    $("#imagePane").show();
-                    $("#toolsPane").hide();
-                    WebPage._currPane = 'image';
-                }
-            }
             if (!event.ctrlKey) return;
             if (event.which == 89) WebPage.history.redo();
             if (event.which == 90) WebPage.history.undo();
@@ -72,8 +62,9 @@ Page.prototype =
         this._onAction(); // Initialize state
         
         // Configure the image bar
-        this.imageBar = new ImageBar();
-        this.toolBar  = new ToolBar();
+        this.imageBar    = new ImageBar();
+        this.toolBar     = new ToolBar();
+        this.contextMenu = new ContextMenu();
 
         // Configure drag'n'drop image upload for the page
         $("#page")[0].addEventListener("dragover", function (e) { e.preventDefault(); }, false);
@@ -99,6 +90,10 @@ Page.prototype =
         // Configure the canvas elements
         var canvasElem = document.getElementById("canvas");
         this.canvas = new Canvas(canvasElem);
+
+        // Configure the image/tool bar toggles
+        $("#tabTool").on("click", $.proxy(function () { this._setActivePane('tools'); }, this));
+        $("#tabImage").on("click", $.proxy(function () { this._setActivePane('image'); }, this));
 
         // Apply the initial image view layout 
         this.applyLayout();
@@ -166,6 +161,25 @@ Page.prototype =
     toolBar: null,  /// <field name='toolBar' type='ToolBar'>Toolbar for fundus image editing</field>
 
     // Private:
+
+    _setActivePane: function (pane) {
+        /// <summary>Sets the active window on the side pane, or hides if null</summary>
+
+        if (pane == this._currPane) return;
+
+        if (pane == 'tools') {
+            $("#imagePane").hide();
+            $("#toolsPane").show();
+        }
+        else if (pane == 'image') {
+            $("#imagePane").show();
+            $("#toolsPane").hide();
+        }
+        else { // Hide
+        }
+
+        this._currPane = pane;
+    },
 
     _onResize: function () {
         /// <summary>Updates the page on a resize event</summary>

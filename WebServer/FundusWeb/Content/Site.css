@@ -96,6 +96,7 @@ h5, h6 {
         background-color:lightgray;
         position:absolute;
         overflow-y:scroll;
+        overflow-x:hidden;
         border: 1px solid #888;
         top:48px;
         bottom:48px;
@@ -122,20 +123,28 @@ h5, h6 {
 /* 
 ----------------------------------------------------------*/
 .tab {
-    border-top-left-radius:3px;
-    border-bottom-left-radius:3px;
+    position:absolute;
+    border-top-left-radius:8px;
+    border-bottom-left-radius:8px;
+    background-color: grey;
     border:1px solid black;
     width:32px;
-    height:32px;
+    height:64px;
+    right:299px;
+    z-index:100;
 }
 
-    .tab :hover {
-        color:aliceblue;
+    .tab:hover {
+        background-color: lightgray;
     }
-    
-    .tab :active {
-        color:darkseagreen;
-    }
+
+#tabTool {
+    top:112px;
+}
+
+#tabImage {
+    top:48px;
+}
 
 /* Site Title 
 ----------------------------------------------------------*/

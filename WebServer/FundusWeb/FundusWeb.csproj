@@ -225,6 +225,7 @@
     <Content Include="Global.asax" />
     <None Include="Scripts\Support\jquery-1.8.2.intellisense.js" />
     <Content Include="Scripts\ActionHistory.js" />
+    <Content Include="Scripts\ContextMenu.js" />
     <Content Include="Scripts\FundusImage.js" />
     <Content Include="Scripts\Hammer\core.js" />
     <Content Include="Scripts\Hammer\detection.js" />

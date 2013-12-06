@@ -2,7 +2,9 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>WebSite</title>
+        <title>Fundus WEB</title>
+        <meta name="mobile-web-app-capable" content="yes"> <!-- Chrome web-app identification header -->
+        <link rel="shortcut icon" sizes="196x196" href="/shortcut-icon.png">
         @Styles.Render("~/Content/css")
         @Styles.Render("~/Content/themes/base/css")
         @Scripts.Render("~/bundles/modernizr")
@@ -10,13 +12,12 @@
     <body style="overflow:hidden;" oncontextmenu="return false;">
         <div id="page">
             <div id="header">
-                <p class="site-title" style="float:left">FundusWeb</p>
-                <div style="float:right">Welcome, UserName</div>
+                <p class="site-title" style="float:left">FundusWEB</p>
                 <div id="messageBar" style="background-color:rgb(234, 234, 234); position:absolute; right:0; width:32em; height:100%"></div>
             </div>
             <div id="main">
                 <!-- Panel for fundus images and tools -->
-                <div id="imageBar" style="border-right:1px solid black; border-top:1px solid black; border-bottom:1px solid black;">
+                <div id="imageBar" style="z-index:100; border-right:1px solid black; border-top:1px solid black; border-bottom:1px solid black;">
                     <input type="file" id="files" accept="image/gif, image/jpeg, image/png, image/bmp" name="files[]" />
                     <button id="uploadButton" title="Upload a new image">Upload Image</button>
 
@@ -24,7 +25,7 @@
                     
                     <!-- Tool panel for advanced annotation / editing -->
                     <div id="toolsPane" class="pane">
-                        <div id="toolWindowLevel" style="margin:8px;"></div>
+                        <div id="toolWindowLevel" style="width:100%"></div>
                         <input type="checkbox" id="toolGrayscale"/><label for="toolGrayscale">Grayscale</label>
                     </div>
 
@@ -34,10 +35,14 @@
                         <button class='history-button' style="margin-left:4%" id="redoButton">Redo</button>
                         <button class='history-button' style="float:right;" title="Resets the application to its original state" id="resetButton">Reset</button>
                     </div>
+
+                    <!-- Tab buttons -->
+                    <div id="tabImage" class="tab"></div>
+                    <div id="tabTool" class="tab"></div>
                 </div>
 
                 <!-- Image viewing pane -->
-                <div id="imageView" style="position:absolute; left:0; right:300px; height:100%; border:1px solid black;">
+                <div id="imageView" style="position:absolute; overflow:visible; left:0; right:300px; height:100%; border:1px solid black;">
                     <!-- Canvas element for image rendering -->
                     <canvas id="canvas" style="position:absolute; left:0; top:0;"></canvas> 
                 
@@ -57,6 +62,14 @@
                         <input id="dispAnn" type="checkbox" title="Display the annotation layer"/><label class="quick-tool" for="dispAnn"></label>
                     </div>
                 </div>
+                
+                <!-- Right click context menu -->
+                <ul id="contextMenu" style="z-index:99999;">
+                    <li><a id="ctxCursor" href="#">Cursor</a></li>
+                    <li><a id="ctxBrush"  href="#">Paint Brush</a></li>
+                    <li><a id="ctxText"   href="#">Text Tool</a></li>
+                    <li><a id="ctxZoom"   href="#">Zoom</a></li>
+                </ul>
             </div>
             <div id="messageBox"></div>
         </div>

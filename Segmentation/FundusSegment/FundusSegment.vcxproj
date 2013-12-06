@@ -85,9 +85,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\FundusSegment.h" />
     <ClInclude Include="Source\MatlabFunctions.h" />
