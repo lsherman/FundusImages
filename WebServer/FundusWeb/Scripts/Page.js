@@ -193,8 +193,10 @@ Page.prototype =
         e.preventDefault();
         var image = WebPage.canvas.getImage();
         if (image) {
-            var delta = e.wheelDelta;
-            image.zoom(delta);
+            var delta  = e.wheelDelta / 30;
+            var factor = Math.pow(1.1, Math.abs(delta));
+            var zoom = (delta > 0) ? factor : 1 / factor;
+            image.zoom(zoom);
         }
     },
 

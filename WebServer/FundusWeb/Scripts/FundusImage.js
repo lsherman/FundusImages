@@ -81,9 +81,9 @@ FundusImage.prototype =
         $(this).trigger('positionChanged', { image: this });
     },
 
-    zoom: function (steps) {
+    zoom: function (factor) {
         /// <summary>Changes the zoomlevel of the image</summary>
-        var scale = this._zoomLevel + steps / 100.0;
+        var scale = this._zoomLevel * factor;
         scale = Math.min(100, Math.max(0.1, scale));
         this.setZoom(scale);
     },

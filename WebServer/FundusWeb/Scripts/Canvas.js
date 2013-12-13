@@ -44,17 +44,20 @@ function Canvas(canvasElem) {
         });
 
         hammertime.on('touch drag transform hold', function (ev) {
+            if (!WebPage.canvas._fundusImage) return;
             switch (ev.type) {
                 case 'touch':
                     WebPage.canvas.last_scale = WebPage.canvas._fundusImage._zoomLevel;
-                    WebPage.canvas.last_posx = WebPage.canvas._fundusImage._offset.x;
-                    WebPage.canvas.last_posy = WebPage.canvas._fundusImage._offset.y;
+                    WebPage.canvas.last_mx = 0;
+                    WebPage.canvas.last_my = 0;
                     break;
 
                 case 'drag':
-                    WebPage.canvas._fundusImage.setPosition(
-                        WebPage.canvas.last_posx + ev.gesture.deltaX / WebPage.canvas._fundusImage._zoomLevel,
-                        WebPage.canvas.last_posy + ev.gesture.deltaY / WebPage.canvas._fundusImage._zoomLevel);
+                    var mx = WebPage.canvas.last_mx - ev.gesture.deltaX;
+                    var my = WebPage.canvas.last_my - ev.gesture.deltaY;
+                    WebPage.canvas._onMove(ev.gesture.srcEvent, mx, my);
+                    WebPage.canvas.last_mx = ev.gesture.deltaX;
+                    WebPage.canvas.last_my = ev.gesture.deltaY;
                     break;
 
                 case 'transform':
@@ -63,7 +66,7 @@ function Canvas(canvasElem) {
                     break;
 
                 case 'hold':
-                    WebPage.contextMenu.open(ev.target);
+                    WebPage.contextMenu.open(ev.gesture.srcEvent);
                     break;
             }
         });
@@ -97,10 +100,10 @@ function Canvas(canvasElem) {
         .click($.proxy(this.print, this));
     quickTools.find(".quickZoomIn")
         .button({ icons: { primary: "icon-quick-zoom-in" }, text: false })
-        .click($.proxy(function () { this.zoom(5); }, this));
+        .click($.proxy(function () { this.zoom(1.1); }, this));
     quickTools.find(".quickZoomOut")
         .button({ icons: { primary: "icon-quick-zoom-out" }, text: false })
-        .click($.proxy(function () { this.zoom(-5); }, this));
+        .click($.proxy(function () { this.zoom(1/1.1); }, this));
 
     // Hotkeys for image annotation and tools
     $(document).keypress(this, this._keyEventHandler);
@@ -122,7 +125,9 @@ Canvas.prototype =
     zoom: function (steps) {
         /// <summary>Changes the zoom level of the fundus image</summary>
         if (this._fundusImage == null) return;
-        this._fundusImage.zoom(steps);
+        var factor = Math.abs(steps);
+        var zoom   = (steps > 0) ? factor : 1 / factor;
+        this._fundusImage.zoom(zoom);
     },
 
     fitToPage: function () {
@@ -261,7 +266,8 @@ Canvas.prototype =
         var a = $("<a id='link' href='#'>Download</a>");
         a.on("click", $.proxy(function () {
             a.attr("href", this._getDataUrl())
-             .attr("download", "Fundus Image.png");
+             .attr("download", "Fundus_Image.png");
+            this.drawCached();
         }, this));
 
         // DOM 2 Events for initiating the anchor link
@@ -284,6 +290,8 @@ Canvas.prototype =
         popup.document.close();
         popup.print();
         popup.close();
+
+        this.drawCached();
     },
 
     getImage: function () {
@@ -308,8 +316,6 @@ Canvas.prototype =
 
         var url = this._offCanvas.toDataURL();
 
-        this.drawCached();
-
         return url;
     },
 
@@ -320,16 +326,27 @@ Canvas.prototype =
 
         if (!this._fundusImage) return;
 
-        if (!this._mousebutton[0]) return;
-
-        var scale = this._fundusImage._zoomLevel;
         var moveX = this._mousePos.x - e.screenX;
         var moveY = this._mousePos.y - e.screenY;
-        moveX /= scale;
-        moveY /= scale;
+        
+        if (this._mousebutton[0]) {
+            this._onMove(e, moveX, moveY);
+        }
+        else if (this._mousebutton[1]) {
+            this._onMove(e, moveX, moveY, CanvasTool.cursor);
+        }
 
-        switch (this._tool) {
+        this._mousePos.x = e.screenX;
+        this._mousePos.y = e.screenY;
+    },
+
+    _onMove: function (e, mx, my, tool) {
+        var action = tool ? tool : this._tool;
+        switch (action) {
             case CanvasTool.cursor:
+                var scale = this._fundusImage._zoomLevel;
+                var moveX = mx/scale;
+                var moveY = my/scale;
                 this._fundusImage.move(-moveX, -moveY);
                 break;
             case CanvasTool.brush:
@@ -337,23 +354,21 @@ Canvas.prototype =
                 var s = this._fundusImage._zoomLevel;
                 var o = this._fundusImage._offset;
                 var i = this._fundusImage.baseImage;
-                var x = e.clientX - c.width() / 2 + s * (i.width / 2 - o.x) - 1;
-                var y = e.clientY - c.height() / 2 + s * (i.height / 2 - o.y) - 26;
-                this._drawLine(this._annCanvas, x, y, x + moveX, y + moveY);
+                var x = (e.clientX - (c.width()  / 2 - s * (i.width  / 2 - o.x)) - 1 ) / s;
+                var y = (e.clientY - (c.height() / 2 - s * (i.height / 2 - o.y)) - 26) / s;
+                this._drawLine(this._annCanvas, x, y, x + mx/s, y + my/s);
                 this.draw();
                 break;
             case CanvasTool.zoom:
-                this._fundusImage.zoom(moveY);
+                var factor = Math.pow(2, my / 300);
+                this._fundusImage.zoom(factor);
                 break;
             case CanvasTool.range:
-                var window = moveX / 500.0 + this._fundusImage._window;
-                var level = moveY / 500.0 + this._fundusImage._level;
+                var window = mx / 500.0 + this._fundusImage._window;
+                var level  = my / 500.0 + this._fundusImage._level;
                 this._fundusImage.setWindowLevel(window, level);
                 break;
         }
-
-        this._mousePos.x = e.screenX;
-        this._mousePos.y = e.screenY;
     },
 
     _drawLine: function (canvas, x1, y1, x2, y2) {
